@@ -1,4 +1,5 @@
-using System.Diagnostics;
+using System.Collections.Generic;
+using scriptableObjects;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -18,6 +19,8 @@ namespace proceduralMaps
     public class Map : MonoBehaviour
     {
         public MapDisplay displayType;
+        public BiomePreset[]  biomes;
+        public GameObject tilePrefab;
         
         [SerializeField]
         private RawImage debugImage;
@@ -48,20 +51,28 @@ namespace proceduralMaps
 
         void Start()
         {
-            GenerateMap();
-            
             if(debugImage == null)
             {
                 debugImage = GetComponent<RawImage>();
                 Debug.Log("raw image not found!");
             }
+
+            if (Application.isPlaying)
+            {
+                GenerateMap();
+            }
         }
 
         void Update()
         {
-            if (!(Time.time - _lastGenerateTime > 0.1f)) return;
-            _lastGenerateTime = Time.time;
-            GenerateMap();
+            if (Application.isPlaying)
+                return;
+
+            if (Time.time - _lastGenerateTime > 0.1f)
+            {
+                _lastGenerateTime = Time.time;
+                GenerateMap();
+            }
         }
 
         void GenerateMap()
@@ -78,9 +89,9 @@ namespace proceduralMaps
             Color[] pixels = new Color[width * height];
             int i = 0;
 
-            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
                     switch (displayType)
                     {
@@ -93,17 +104,28 @@ namespace proceduralMaps
                         case MapDisplay.Heat:
                             pixels[i] = heatDebugColors.Evaluate(HeatMap[x, y]);
                             break;
+
+                        case MapDisplay.Biome:
+                        {
+                            BiomePreset biome = GetBiome(HeightMap[x, y], MoistureMap[x, y], HeatMap[x, y]);
+                            pixels[i] = biome.debugColor;
+
+                            if (Application.isPlaying)
+                            {
+                                GameObject tile = Instantiate(tilePrefab, new Vector3(x, y, 0), Quaternion.identity);
+                                tile.GetComponent<SpriteRenderer>().sprite = biome.GetTileSprite();
+                            }
+                            
+                            break;
+                        }
                         
                         default:
+                            Debug.Log("Unknown display type");
                             break;
                     }
 
                     i++;
-
-                    /*
-                     * pixels[i] = Color.Lerp(Color.black, Color.white, HeightMap[x, y]);
-                     *i++;
-                     */
+                    
                 }
             }
             
@@ -113,18 +135,44 @@ namespace proceduralMaps
             tex.Apply();
             
             debugImage.texture = tex;
+            
+        }
 
-            /*
-            for (int x = 0; x < width; x++)
+        BiomePreset GetBiome(float height, float moisture, float heat)
+        {
+            BiomePreset biomeToReturn = null;
+            List<BiomePreset> tempBiomes = new List<BiomePreset>();
+
+            foreach (BiomePreset biome in biomes)
             {
-                for (int y = 0; y < height; y++)
+                if (biome.MatchCondition(height, moisture, heat))
                 {
-                    Debug.Log(HeightMap[x, y]);
+                    tempBiomes.Add(biome);
                 }
             }
-            */
+
+            float curValue = 0.0f;
+
+            foreach (BiomePreset biome in tempBiomes)
+            {
+                float diffValue = (height - biome.minHeight) + (moisture - biome.minMoisture) +  (heat - biome.minHeat);
+
+                if (biomeToReturn == null)
+                {
+                    biomeToReturn = biome;
+                    curValue = diffValue;
+                }
+                else if (diffValue < curValue)
+                {
+                    biomeToReturn = biome;
+                    curValue = diffValue;
+                }
+            }
+
+            if (biomeToReturn == null)
+                return biomes[0];
+            
+            return biomeToReturn;
         }
     }
-
 }
-

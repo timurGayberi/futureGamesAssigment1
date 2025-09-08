@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f885ec62a998a54291b7ba682d841d2, type: 3}
+  m_Name: world3
+  m_EditorClassIdentifier: Assembly-CSharp::scriptableObjects.BiomePreset
+  debugColor: {r: 0, g: 0.42783022, b: 1, a: 0}
+  tileSprites:
+  - {fileID: 1271489776, guid: 8aa40deeef8eb884f8f166f05c7c6938, type: 3}
+  - {fileID: -355280818, guid: 8aa40deeef8eb884f8f166f05c7c6938, type: 3}
+  - {fileID: -1343114352, guid: 8aa40deeef8eb884f8f166f05c7c6938, type: 3}
+  minHeight: 0.5
+  minMoisture: 9.5
+  minHeat: 1
