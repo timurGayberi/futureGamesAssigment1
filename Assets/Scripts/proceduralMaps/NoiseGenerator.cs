@@ -4,7 +4,7 @@ namespace proceduralMaps
 {
     public class NoiseGenerator : MonoBehaviour
     {
-        public static float[,] Generate(int width, int height, float scale, Vector2 offset)
+        public static float[,] Generate(int width, int height, float scale, Vector2 offset, Wave[] waves)
         {
             float[,] noiseMap = new float[width, height];
 
@@ -13,13 +13,34 @@ namespace proceduralMaps
                 for (int y = 0; y < height; y++)
                 {
                     float sampleX = (float)x * scale + offset.x,
-                          sampleY = (float)y * scale + offset.y;
+                          sampleY = (float)y * scale + offset.y,
+                          normalization = 0.0f;
+
+                    foreach (var wave in waves)
+                    {
+                        float waveSamplePosX = sampleX * wave.frequency + wave.seed,
+                              waveSamplePosY = sampleY * wave.frequency + wave.seed;
+                        
+                        noiseMap[x, y] += wave.amplitude * Mathf.PerlinNoise(waveSamplePosX, waveSamplePosY);
+                        normalization += wave.amplitude;
+                    }
                     
-                    noiseMap[x, y] = Mathf.PerlinNoise(sampleX, sampleY);
+                    noiseMap[x, y] /= normalization;
+                    
                 }
             }
             
             return noiseMap;
         }
     }
+
+    [System.Serializable]
+    public class Wave
+    {
+        public float seed, frequency, amplitude;
+        
+    }
+
 }
+
+
