@@ -15,7 +15,6 @@ namespace proceduralMaps
         Biome
     }
 
-    [ExecuteInEditMode]
     public class Map : MonoBehaviour
     {
         public MapDisplay displayType;
@@ -47,35 +46,7 @@ namespace proceduralMaps
         public float[,] HeatMap;
         
 
-        private float _lastGenerateTime;
-
-        void Start()
-        {
-            if(debugImage == null)
-            {
-                debugImage = GetComponent<RawImage>();
-                Debug.Log("raw image not found!");
-            }
-
-            if (Application.isPlaying)
-            {
-                GenerateMap();
-            }
-        }
-
-        void Update()
-        {
-            if (Application.isPlaying)
-                return;
-
-            if (Time.time - _lastGenerateTime > 0.1f)
-            {
-                _lastGenerateTime = Time.time;
-                GenerateMap();
-            }
-        }
-
-        void GenerateMap()
+        public void GenerateMap()
         {
             //Generating the height map
             HeightMap = NoiseGenerator.Generate(width, height, scale, offset, heightWaves);
@@ -110,11 +81,9 @@ namespace proceduralMaps
                             BiomePreset biome = GetBiome(HeightMap[x, y], MoistureMap[x, y], HeatMap[x, y]);
                             pixels[i] = biome.debugColor;
 
-                            if (Application.isPlaying)
-                            {
-                                GameObject tile = Instantiate(tilePrefab, new Vector3(x, y, 0), Quaternion.identity);
-                                tile.GetComponent<SpriteRenderer>().sprite = biome.GetTileSprite();
-                            }
+                            // We're now instantiating tiles relative to the chunk's origin
+                            GameObject tile = Instantiate(tilePrefab, new Vector3(x + offset.x, y + offset.y, 0), Quaternion.identity, transform);
+                            tile.GetComponent<SpriteRenderer>().sprite = biome.GetTileSprite();
                             
                             break;
                         }
@@ -129,13 +98,18 @@ namespace proceduralMaps
                 }
             }
             
-            Texture2D tex = new Texture2D(width, height);
-            tex.SetPixels(pixels);
-            tex.filterMode = FilterMode.Point;
-            tex.Apply();
-            
-            debugImage.texture = tex;
-            
+            if (Application.isEditor)
+            {
+                Texture2D tex = new Texture2D(width, height);
+                tex.SetPixels(pixels);
+                tex.filterMode = FilterMode.Point;
+                tex.Apply();
+                
+                if (debugImage != null)
+                {
+                    debugImage.texture = tex;
+                }
+            }
         }
 
         BiomePreset GetBiome(float height, float moisture, float heat)
