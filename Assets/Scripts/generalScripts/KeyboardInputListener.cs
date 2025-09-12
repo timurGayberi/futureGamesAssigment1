@@ -2,64 +2,51 @@ using UnityEngine;
 
 namespace GeneralScripts
 {
-    /// <summary>
-    /// A singleton class for listening to keyboard inputs.
-    /// This allows other scripts to easily access the state of keyboard presses.
-    /// </summary>
     public class KeyboardInputListener : MonoBehaviour
     {
         public static KeyboardInputListener Instance { get; private set; }
 
-        // Public properties to be accessed by other classes.
         public Vector2 MoveInput { get; private set; }
-        public bool IsEscapePressed { get; private set; }
+        public float StrafeInput { get; private set; } // New property for strafing (Q/E)
+        public float RotationInput { get; private set; } // New property for rotation (A/D)
 
         private void Awake()
         {
-            // Singleton pattern to ensure only one instance exists.
-            if (Instance != null && Instance != this)
+            if (Instance == null)
             {
-                Destroy(this.gameObject);
-                return;
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
             }
-            Instance = this;
-            DontDestroyOnLoad(this.gameObject);
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         private void Update()
         {
-            // Reset input values at the start of the frame.
-            MoveInput = Vector2.zero;
-            IsEscapePressed = false;
-
-            // Check for WASD and Arrow key input.
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            // Get forward/backward input from W/S keys.
+            float y = Input.GetAxisRaw("Vertical");
+            MoveInput = new Vector2(0, y);
+            
+            StrafeInput = 0f;
+            if (Input.GetKey(KeyCode.D))
             {
-                MoveInput += Vector2.up;
+                StrafeInput = 1f;
             }
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            else if (Input.GetKey(KeyCode.A))
             {
-                MoveInput += Vector2.down;
-            }
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            {
-                MoveInput += Vector2.left;
-            }
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            {
-                MoveInput += Vector2.right;
+                StrafeInput = -1f;
             }
             
-            // Normalize the vector to prevent faster diagonal movement.
-            if (MoveInput.magnitude > 1)
+            RotationInput = 0f;
+            if (Input.GetKey(KeyCode.E))
             {
-                MoveInput.Normalize();
+                RotationInput = -1f;
             }
-
-            // Check for the Escape key.
-            if (Input.GetKeyDown(KeyCode.Escape))
+            else if (Input.GetKey(KeyCode.Q))
             {
-                IsEscapePressed = true;
+                RotationInput = 1f;
             }
         }
     }

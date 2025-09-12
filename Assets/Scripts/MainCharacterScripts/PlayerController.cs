@@ -11,9 +11,7 @@ namespace MainCharacterScripts
 
         [Header("Stats")]
         [SerializeField] private PlayerStats playerStats;
-
-        private const float RotationOffset = -90f;
-
+        
         private void Awake()
         {
             playerMovement.Initialize(playerStats);
@@ -22,8 +20,10 @@ namespace MainCharacterScripts
         private void Update()
         {
             var moveInput = KeyboardInputListener.Instance.MoveInput;
+            float strafeInput = KeyboardInputListener.Instance.StrafeInput;
+            float rotationInput = KeyboardInputListener.Instance.RotationInput;
             
-            Vector2 relativeMovement = transform.up * moveInput.y + transform.right * moveInput.x;
+            Vector2 relativeMovement = (Vector2)transform.up * moveInput.y + (Vector2)transform.right * strafeInput;
             
             if (relativeMovement.magnitude > 1f)
             {
@@ -34,21 +34,7 @@ namespace MainCharacterScripts
             
             playerMovement.Tick();
             
-            RotateTowardMouse();
-        }
-
-        private void RotateTowardMouse()
-        {
-            Vector3 mousePosition = Input.mousePosition;
-            
-            mousePosition.z = transform.position.z - Camera.main.transform.position.z;
-            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            
-            Vector3 direction = mouseWorldPosition - transform.position;
-            
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + RotationOffset));
+            transform.Rotate(Vector3.forward, rotationInput * playerStats.rotationSpeed * Time.deltaTime);
         }
     }
 }
