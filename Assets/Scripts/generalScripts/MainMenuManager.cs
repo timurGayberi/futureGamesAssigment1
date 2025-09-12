@@ -41,26 +41,6 @@ namespace generalScripts
             }
             
             panels[(int)_currentPanel].SetActive(true);
-
-            /*switch (_currentPanel)
-            {
-                case CurrentPanel.MainMenu:
-                    mainMenu.SetActive(true);
-                    break;
-                case CurrentPanel.StartGame:
-                    mainMenu.SetActive(false);
-                    break;
-                case CurrentPanel.Extras:
-                    mainMenu.SetActive(false);
-                    _currentPanel = CurrentPanel.Extras;
-                    break;
-                case CurrentPanel.Exit:
-                    mainMenu.SetActive(false);
-                    break;
-                default:
-                    Debug.LogError("Unknown CurrentPanel");
-                    break;
-            }*/
         }
 
         public void OnStartButtonClick()
