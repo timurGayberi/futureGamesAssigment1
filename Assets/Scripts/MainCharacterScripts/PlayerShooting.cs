@@ -1,23 +1,86 @@
 using UnityEngine;
+using scriptableObjects;
+using GeneralScripts;
 
 namespace MainCharacterScripts
 {
     public class PlayerShooting : MonoBehaviour
     {
-        // The prefab for the projectile is commented out for now to prevent errors.
-        // [Header("Component References")]
-        // [SerializeField] private GameObject projectilePrefab;
+        [Header("Projectile Spawn Point")]
+        [SerializeField]
+        private Transform projectileSpawnPoint;
 
-        public void Shoot()
+        [Header("Weapon Data")]
+        [SerializeField]
+        private WeaponData bulletData,
+                           missileData;
+
+        private float _lastBulletShotTime,
+                      _lastMissileShotTime,
+                      _reloadTimer;
+
+        private int _currentMissileAmmo;
+
+        private void Awake()
         {
-            // Logic to instantiate the projectile and handle shooting will go here.
-            // For now, this method does nothing.
+            _currentMissileAmmo = missileData.maxAmmo;
         }
 
-        public void SpecialAttack()
+        private void Update()
         {
-            // Logic for a special attack will go here.
-            // For now, this method does nothing.
+            if (KeyboardInputListener.Instance.MouseLeftClick && CanFire(bulletData))
+            {
+                FireWeapon(bulletData);
+            }
+            
+            if (KeyboardInputListener.Instance.MouseRightClick && CanFire(missileData))
+            {
+                FireWeapon(missileData);
+                Debug.Log("Missile Shot");
+            }
+
+            if (_reloadTimer > 0)
+            {
+                _reloadTimer -= Time.deltaTime;
+                if (_reloadTimer <= 0)
+                {
+                    _currentMissileAmmo = missileData.maxAmmo;
+                    Debug.Log("Missiles reloaded!");
+                }
+            }
+        }
+
+        private bool CanFire(WeaponData weaponData)
+        {
+            if (weaponData == bulletData)
+            {
+                return Time.time - _lastBulletShotTime >= weaponData.fireRate;
+            }
+            else if (weaponData == missileData)
+            {
+                return Time.time - _lastMissileShotTime >= weaponData.fireRate && _currentMissileAmmo > 0;
+            }
+            return false;
+        }
+
+        private void FireWeapon(WeaponData weaponData)
+        {
+            if (weaponData == bulletData)
+            {
+                _lastBulletShotTime = Time.time;
+            }
+            else if (weaponData == missileData)
+            {
+                _lastMissileShotTime = Time.time;
+                _currentMissileAmmo--;
+                if (_currentMissileAmmo == 0)
+                {
+                    _reloadTimer = missileData.reloadTime;
+                    Debug.Log("Out of missiles");
+                }
+            }
+
+            Instantiate(weaponData.projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
         }
     }
 }

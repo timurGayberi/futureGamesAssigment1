@@ -4,11 +4,13 @@ namespace GeneralScripts
 {
     public class KeyboardInputListener : MonoBehaviour
     {
-        public static KeyboardInputListener Instance { get; private set; }
+        public static KeyboardInputListener Instance;
 
         public Vector2 MoveInput { get; private set; }
-        public float StrafeInput { get; private set; } // New property for strafing (Q/E)
-        public float RotationInput { get; private set; } // New property for rotation (A/D)
+        public float StrafeInput { get; private set; } 
+        public float RotationInput { get; private set; }
+        public bool MouseLeftClick { get; private set; }
+        public bool MouseRightClick { get; private set; }
 
         private void Awake()
         {
@@ -25,7 +27,6 @@ namespace GeneralScripts
 
         private void Update()
         {
-            // Get forward/backward input from W/S keys.
             float y = Input.GetAxisRaw("Vertical");
             MoveInput = new Vector2(0, y);
             
@@ -48,6 +49,11 @@ namespace GeneralScripts
             {
                 RotationInput = 1f;
             }
+            
+            MouseLeftClick = Input.GetMouseButton(0);
+            MouseRightClick = Input.GetMouseButton(1);
+            
         }
+        
     }
 }
