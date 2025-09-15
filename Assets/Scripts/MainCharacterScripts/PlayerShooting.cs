@@ -36,7 +36,6 @@ namespace MainCharacterScripts
             if (KeyboardInputListener.Instance.MouseRightClick && CanFire(missileData))
             {
                 FireWeapon(missileData);
-                Debug.Log("Missile Shot");
             }
 
             if (_reloadTimer > 0)
