@@ -46,6 +46,12 @@ namespace proceduralMaps
 
         private void Update()
         {
+            // IMPORTANT: Check if the player still exists before trying to access their position.
+            if (playerTransform == null)
+            {
+                return;
+            }
+
             Vector2Int newChunk = GetChunkCoordinates(playerTransform.position);
             if (newChunk != _currentPlayerChunk)
             {
@@ -71,8 +77,7 @@ namespace proceduralMaps
                     }
                 }
             }
-
-            // Unload chunks that are no longer in the view distance
+            
             List<Vector2Int> chunksToUnload = new List<Vector2Int>();
             foreach (var chunk in _loadedChunks)
             {

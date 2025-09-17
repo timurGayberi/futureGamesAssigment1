@@ -2,6 +2,7 @@ using UnityEngine;
 using MainCharacterScripts;
 using generalScripts;
 using scriptableObjects;
+using UnityEngine.Serialization;
 
 namespace EnemyScripts
 {
@@ -9,16 +10,17 @@ namespace EnemyScripts
     {
         private Transform _playerTransform;
         private EnemyData _enemyData;
-
+        private float _lastAttackTime;
+        
         [Header("Component References")]
         [SerializeField]
-        private Health _health;
+        private Health health;
 
         public void Initialize(Transform playerTransform, EnemyData enemyData)
         {
             _playerTransform = playerTransform;
             _enemyData = enemyData;
-            _health.SetMaxHealth(enemyData.maxHealth);
+            health.SetMaxHealth(enemyData.maxHealth);
         }
 
         private void Update()
@@ -38,8 +40,8 @@ namespace EnemyScripts
 
         public void TakeDamage(float damage)
         {
-            _health.TakeDamage(damage);
-            Debug.Log("Enemy got damaged!");
+            health.TakeDamage(damage);
+            //Debug.Log("Enemy got damaged");
         }
 
         public void Die()
@@ -47,27 +49,34 @@ namespace EnemyScripts
             Destroy(gameObject);
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        private void DealDamageToPlayer(Collider2D other)
         {
-            // A simple debug log to confirm the collision method is being called.
-            Debug.Log("Collision Detected!");
-
-            if (collision.gameObject.CompareTag("Player"))
+            Health playerHealth = other.GetComponent<Health>();
+            if (playerHealth != null)
             {
-                Debug.Log("Enemy collided with player. Dealing damage.");
-                Health playerHealth = collision.gameObject.GetComponent<Health>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(_enemyData.damage);
-                }
+                playerHealth.TakeDamage(_enemyData.damage);
             }
-            else if (collision.gameObject.CompareTag("projectile"))
+        }
+        
+        // Deals damage on the first frame of collision.
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Player"))
             {
-                Debug.Log("Enemy collided with projectile. Taking damage.");
-                ProjectileController projectile = collision.gameObject.GetComponent<ProjectileController>();
-                if (projectile != null)
+                DealDamageToPlayer(other);
+                _lastAttackTime = Time.time;
+            }
+        }
+        
+        // Deals damage on a timer as long as the player is in the trigger.
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                if (Time.time >= _lastAttackTime + _enemyData.attackCooldown)
                 {
-                    _health.TakeDamage(projectile.GetDamage());
+                    DealDamageToPlayer(other);
+                    _lastAttackTime = Time.time;
                 }
             }
         }

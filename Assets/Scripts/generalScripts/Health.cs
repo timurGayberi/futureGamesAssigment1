@@ -1,28 +1,20 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using TMPro;
 
 namespace generalScripts
 {
     public class Health : MonoBehaviour
     {
         [Header("Health Stats")]
-        [SerializeField] 
+        [SerializeField]
         private float maxHealth;
-        [SerializeField] 
+        [SerializeField]
         private float currentHealth;
         
         [Header("UI References")]
         [SerializeField]
         private TextMeshProUGUI healthText;
-        
-        [Header("Game Manager References")]
-        [SerializeField]
-        private GameObject gameUIManager;
-
-        [SerializeField]
-        private bool isPlayer;
         
         [Header("Events")]
         public UnityEvent onTakeDamage;
@@ -31,12 +23,14 @@ namespace generalScripts
         private void Awake()
         {
             currentHealth = maxHealth;
+            UpdateHealthUI();
         }
 
         public void SetMaxHealth(float newMaxHealth)
         {
             maxHealth = newMaxHealth;
             currentHealth = maxHealth;
+            UpdateHealthUI();
         }
 
         public void TakeDamage(float damageAmount)
@@ -44,10 +38,24 @@ namespace generalScripts
             currentHealth -= damageAmount;
             
             onTakeDamage.Invoke();
+            UpdateHealthUI();
             
             if (currentHealth <= 0)
             {
-                onDie.Invoke();
+                Die();
+            }
+        }
+        
+        private void Die()
+        {
+            onDie.Invoke();
+        }
+
+        private void UpdateHealthUI()
+        {
+            if (healthText != null)
+            {
+                healthText.text = "Health: " + Mathf.Max(0, currentHealth).ToString("F0");
             }
         }
     }

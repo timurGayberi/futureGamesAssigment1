@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Enemy
   m_EditorClassIdentifier: Assembly-CSharp::scriptableObjects.EnemyData
   maxHealth: 20
-  moveSpeed: 1
-  damage: 100
+  moveSpeed: 2
+  damage: 50
   isRanged: 0
-  attackCooldown: 0
+  attackCooldown: 1

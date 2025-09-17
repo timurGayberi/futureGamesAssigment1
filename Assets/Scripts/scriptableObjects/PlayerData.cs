@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace MainCharacterScripts
+namespace scriptableObjects
 {
     [System.Serializable]
     public class PlayerData

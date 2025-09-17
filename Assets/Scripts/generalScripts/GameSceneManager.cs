@@ -1,69 +1,30 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using generalScripts;
 using MainCharacterScripts;
 
 namespace generalScripts
 {
     public class GameSceneManager : MonoBehaviour
     {
-        [SerializeField] private GameUIManager gameUIManager;
+        [SerializeField]
+        private GameObject playerPrefab;
+        [SerializeField]
+        private Transform playerSpawnPoint;
 
         private void Start()
         {
-            UnpauseGame();
-
-            if (JsonSaveManager.Instance != null && !string.IsNullOrEmpty(JsonSaveManager.Instance.CurrentPlayerUsername))
+            if (playerPrefab != null && playerSpawnPoint != null)
             {
-                gameUIManager.SetPlayerName(JsonSaveManager.Instance.CurrentPlayerUsername);
+                Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
             }
         }
 
         private void Update()
         {
-            // Listen for ESC key press using old input system
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                TogglePause();
+                GameManager.Instance.TogglePause();
             }
-        }
-
-        public void UpdateScore(int newScore)
-        {
-            gameUIManager.UpdateScore(newScore);
-        }
-
-        private void TogglePause()
-        {
-            if (Time.timeScale == 1f)
-            {
-                PauseGame();
-            }
-            else
-            {
-                UnpauseGame();
-            }
-        }
-
-        private void PauseGame()
-        {
-            Time.timeScale = 0f;
-            gameUIManager.ShowPauseMenu();
-        }
-
-        public void UnpauseGame()
-        {
-            Time.timeScale = 1f;
-            gameUIManager.HidePauseMenu();
-        }
-
-        public void GoToMainMenu()
-        {
-            SceneManager.LoadScene(0);
-        }
-
-        public void ExitGame()
-        {
-            Application.Quit();
         }
     }
 }
