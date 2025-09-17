@@ -1,23 +1,25 @@
-using System;
 using UnityEngine;
-using TMPro;
-using MainCharacterScripts;
 using UnityEngine.SceneManagement;
+using MainCharacterScripts;
+using TMPro;
 
 namespace generalScripts
 {
     public class GameUIManager : MonoBehaviour
     {
+        [Header("UI Panels")]
         [SerializeField]
         private GameObject pauseMenuPanel;
-        
+        [SerializeField]
+        private GameObject gameOverPanel;
+
+        [Header("UI Text")]
         [SerializeField]
         private TextMeshProUGUI playerNameText;
-        
         [SerializeField]
         private TextMeshProUGUI playerScoreText;
-        
-        private string _playerNoName;
+        [SerializeField]
+        private TextMeshProUGUI gameOverScoreText;
 
         private int _currentScore;
 
@@ -25,31 +27,36 @@ namespace generalScripts
         {
             _currentScore = 0;
             UpdateScore(_currentScore);
-            
-            _playerNoName = "no name";
-            
-            if (playerNameText == null)
-            {
-                SetPlayerName(_playerNoName);
-            }
-            
+            HideGameOverMenu();
         }
 
         public void ShowPauseMenu()
         {
             pauseMenuPanel.SetActive(true);
         }
-        
+
         public void HidePauseMenu()
         {
             pauseMenuPanel.SetActive(false);
         }
-        
+
+        public void ShowGameOverMenu()
+        {
+            HidePauseMenu();
+            gameOverPanel.SetActive(true);
+            gameOverScoreText.text = "Final Score: " + _currentScore;
+        }
+
+        public void HideGameOverMenu()
+        {
+            gameOverPanel.SetActive(false);
+        }
+
         public void SetPlayerName(string name)
         {
             playerNameText.text = "Player: " + name;
         }
-        
+
         public void UpdateScore(int score)
         {
             _currentScore = score;
@@ -65,7 +72,6 @@ namespace generalScripts
         public void OnMainMenuClicked()
         {
             JsonSaveManager.Instance.AddOrUpdateHighScore(JsonSaveManager.Instance.CurrentPlayerUsername, _currentScore);
-            
             Time.timeScale = 1f;
             SceneManager.LoadScene(0);
         }
@@ -73,8 +79,14 @@ namespace generalScripts
         public void OnExitGameClicked()
         {
             JsonSaveManager.Instance.AddOrUpdateHighScore(JsonSaveManager.Instance.CurrentPlayerUsername, _currentScore);
-            
             Application.Quit();
+        }
+        
+        public void OnRestartGameClicked()
+        {
+            JsonSaveManager.Instance.AddOrUpdateHighScore(JsonSaveManager.Instance.CurrentPlayerUsername, _currentScore);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Time.timeScale = 1f;
         }
     }
 }

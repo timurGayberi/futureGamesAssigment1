@@ -9,9 +9,10 @@ namespace scriptableObjects
         public string weaponName;
         public GameObject projectilePrefab;
 
-        [Header("Firing Properties")] 
+        [Header("Firing Properties")]
         public float fireRate,
                      projectileSpeed,
+                     projectileGetDestroyTime,
                      projectileDamage;
 
         [Header("Ammo Properties")] 

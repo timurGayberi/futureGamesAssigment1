@@ -1,10 +1,13 @@
+using System;
 using UnityEngine;
-using GeneralScripts; // Now we reference our new input listener.
+using GeneralScripts; 
 
 namespace MainCharacterScripts
 {
     public class PlayerController : MonoBehaviour
     {
+        public static PlayerController Instance;
+        
         [Header("Component References")]
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerShooting playerShooting;
@@ -13,6 +16,19 @@ namespace MainCharacterScripts
         [SerializeField] private PlayerStats playerStats;
         
         private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        public void Start()
         {
             playerMovement.Initialize(playerStats);
         }

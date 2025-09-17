@@ -1,5 +1,6 @@
 using UnityEngine;
 using scriptableObjects;
+using generalScripts;
 
 namespace MainCharacterScripts
 {
@@ -18,7 +19,12 @@ namespace MainCharacterScripts
 
         [SerializeField] 
         private Rigidbody2D body;
-
+        
+        
+        public float GetDamage()
+        {
+            return data.projectileDamage;
+        }
 
         private void Start()
         {
@@ -27,7 +33,7 @@ namespace MainCharacterScripts
                 GetComponent<Rigidbody2D>().linearVelocity = transform.up * data.projectileSpeed;
             }
 
-            Destroy(gameObject, 5f);
+            Destroy(gameObject, data.projectileGetDestroyTime);
 
         }
 
@@ -35,11 +41,18 @@ namespace MainCharacterScripts
         {
             if (other.CompareTag("Enemy"))
             {
+                Health enemyHealth = other.GetComponent<Health>();
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(data.projectileDamage);
+                }
+                
                 if (data.isExplosive)
                 {
                     ApplyAreaDamage();
                     Instantiate(explosivePrefab, transform.position, Quaternion.identity);
                 }
+                
                 Destroy(gameObject);
             }
         }
@@ -50,11 +63,16 @@ namespace MainCharacterScripts
 
             foreach (Collider2D hit in colliders)
             {
-                //hit.GetComponent<EnemyHealth>().TakeDamage(data.projectileDamage);
+                if (hit.CompareTag("Enemy"))
+                {
+                    Health enemyHealth = hit.GetComponent<Health>();
+                    if (enemyHealth != null)
+                    {
+                        enemyHealth.TakeDamage(data.projectileDamage);
+                    }
+                }
             }
             
         }
-
     }
-
 }
