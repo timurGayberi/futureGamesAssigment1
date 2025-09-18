@@ -1,7 +1,8 @@
+using MainCharacterScripts;
+using proceduralMaps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using MainCharacterScripts; 
-using generalScripts; 
+using Unity.VisualScripting;
 
 namespace generalScripts
 {
@@ -17,6 +18,8 @@ namespace generalScripts
         public static GameManager Instance { get; private set; }
 
         public GameState CurrentGameState { get; private set; }
+        
+        private float _gameTime;
 
         private GameUIManager _gameUIManager;
 
@@ -26,18 +29,32 @@ namespace generalScripts
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                SceneManager.sceneLoaded += OnSceneLoaded;
             }
             else
             {
                 Destroy(gameObject);
             }
         }
-
+        
         private void Start()
         {
-            // Get the singleton instance of the UI manager.
             _gameUIManager = GameUIManager.Instance;
+            _gameTime = Time.realtimeSinceStartup;
             SetGameState(GameState.Gameplay);
+        }
+
+        private void Update()
+        {
+            if (CurrentGameState == GameState.Gameplay)
+            {
+                _gameTime += Time.deltaTime;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         public void RegisterUIManager(GameUIManager uiManager)
@@ -64,7 +81,6 @@ namespace generalScripts
 
         public void RestartGame()
         {
-            SetGameState(GameState.Gameplay);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
@@ -95,6 +111,31 @@ namespace generalScripts
                     }
                     break;
             }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.buildIndex == SceneManager.GetActiveScene().buildIndex)
+            {
+                if (WorldManager.Instance != null)
+                {
+                    PlayerController newPlayer = FindObjectOfType<PlayerController>();
+                    if (newPlayer != null)
+                    {
+                        WorldManager.Instance.ResetWorld(newPlayer.transform);
+                    }
+                }
+                SetGameState(GameState.Gameplay);
+            }
+        }
+
+        public string GetFormatedTime()
+        {
+            int hours = Mathf.FloorToInt(_gameTime / 3600),
+                minutes = Mathf.FloorToInt((_gameTime % 3600) / 60),
+                seconds = Mathf.FloorToInt(_gameTime % 60);
+            
+            return $"{hours:00}:{minutes:00}:{seconds:00}";
         }
     }
 }

@@ -58,7 +58,6 @@ namespace EnemyScripts
             }
         }
         
-        // Deals damage on the first frame of collision.
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Player"))
@@ -68,7 +67,6 @@ namespace EnemyScripts
             }
         }
         
-        // Deals damage on a timer as long as the player is in the trigger.
         private void OnTriggerStay2D(Collider2D other)
         {
             if (other.CompareTag("Player"))

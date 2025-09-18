@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using MainCharacterScripts; 
 
 namespace proceduralMaps
 {
@@ -8,16 +9,16 @@ namespace proceduralMaps
         public static WorldManager Instance;
 
         [Header("References")]
-        [SerializeField] private Transform playerTransform;
         [SerializeField] private GameObject chunkPrefab;
         
         [Header("Settings")]
-        public int chunkWidth = 32;
-        public int chunkHeight = 32;
-        public int viewDistance = 3; // Number of chunks to load in each direction from the player.
+        public int chunkWidth ;
+        public int chunkHeight ;
+        public int viewDistance ; 
         
+        private Transform _playerTransform;
         private Vector2Int _currentPlayerChunk;
-        private Dictionary<Vector2Int, GameObject> _loadedChunks = new Dictionary<Vector2Int, GameObject>();
+        private readonly Dictionary<Vector2Int, GameObject> _loadedChunks = new Dictionary<Vector2Int, GameObject>();
 
         private void Awake()
         {
@@ -34,30 +35,44 @@ namespace proceduralMaps
 
         private void Start()
         {
-            if (playerTransform == null)
+            PlayerController newPlayer = FindObjectOfType<PlayerController>();
+            if (newPlayer != null)
             {
-                Debug.LogError("Player Transform is not assigned in WorldManager.");
-                return;
+                ResetWorld(newPlayer.transform);
             }
-
-            _currentPlayerChunk = GetChunkCoordinates(playerTransform.position);
-            GenerateWorld();
         }
 
         private void Update()
         {
-            // IMPORTANT: Check if the player still exists before trying to access their position.
-            if (playerTransform == null)
+            if (_playerTransform == null)
             {
                 return;
             }
 
-            Vector2Int newChunk = GetChunkCoordinates(playerTransform.position);
+            Vector2Int newChunk = GetChunkCoordinates(_playerTransform.position);
             if (newChunk != _currentPlayerChunk)
             {
                 _currentPlayerChunk = newChunk;
                 GenerateWorld();
             }
+        }
+        
+        public void ResetWorld(Transform newPlayerTransform)
+        {
+            foreach (var chunk in _loadedChunks.Values)
+            {
+                Destroy(chunk);
+            }
+            _loadedChunks.Clear();
+            
+            _playerTransform = newPlayerTransform;
+            if (_playerTransform == null)
+            {
+                return;
+            }
+            
+            _currentPlayerChunk = GetChunkCoordinates(_playerTransform.position);
+            GenerateWorld();
         }
 
         private void GenerateWorld()
@@ -95,24 +110,26 @@ namespace proceduralMaps
 
         private void GenerateChunk(Vector2Int coords)
         {
+            if (chunkPrefab == null)
+            {
+                return;
+            }
+            
             GameObject chunkInstance = Instantiate(chunkPrefab, new Vector3(coords.x * chunkWidth, coords.y * chunkHeight, 0), Quaternion.identity);
             chunkInstance.name = $"Chunk_{coords.x}_{coords.y}";
             
             Map mapComponent = chunkInstance.GetComponent<Map>();
             if (mapComponent == null)
             {
-                Debug.LogError("Chunk Prefab is missing a Map component!");
                 return;
             }
-
-            // Set the map dimensions and offset for the chunk
+            
             mapComponent.width = chunkWidth;
             mapComponent.height = chunkHeight;
             mapComponent.offset = new Vector2(coords.x * chunkWidth, coords.y * chunkHeight);
 
             _loadedChunks.Add(coords, chunkInstance);
             
-            // Generate the map data for this specific chunk.
             mapComponent.GenerateMap();
         }
 
