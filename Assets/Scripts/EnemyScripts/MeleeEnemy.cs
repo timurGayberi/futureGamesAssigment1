@@ -21,6 +21,7 @@ namespace EnemyScripts
             _playerTransform = playerTransform;
             _enemyData = enemyData;
             health.SetMaxHealth(enemyData.maxHealth);
+            health.onDie.AddListener(Die);
         }
 
         private void Update()
@@ -46,6 +47,11 @@ namespace EnemyScripts
 
         public void Die()
         {
+            DifficultyManager.Instance.EnemyKilled();
+
+            float scoreToAdd = DifficultyManager.Instance.GetScoreForEnemy(EnemyType.Melee);
+            GameManager.Instance.AddScore((int)scoreToAdd);
+            
             Destroy(gameObject);
         }
 

@@ -1,3 +1,4 @@
+using EnemyScripts;
 using UnityEngine;
 
 namespace scriptableObjects
@@ -5,16 +6,18 @@ namespace scriptableObjects
     [CreateAssetMenu(fileName = "New enemy data", menuName = "Enemy/Enemy data")]
     public class EnemyData : ScriptableObject
     {
+        [Header("Enemy type")]
+        public EnemyType enemyType;
+        //public bool isRanged;
+        
         [Header("Enemy stats")]
-        //public string name;
-
         public float maxHealth,
                      moveSpeed,
                      damage;
+        
+        public int scoreValue;
 
         [Header("Behaviour")] 
-        public bool isRanged;
-        
         public float attackCooldown;
 
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MainCharacterScripts; 
@@ -33,6 +34,7 @@ namespace proceduralMaps
             }
         }
 
+        [Obsolete("Obsolete")]
         private void Start()
         {
             PlayerController newPlayer = FindObjectOfType<PlayerController>();

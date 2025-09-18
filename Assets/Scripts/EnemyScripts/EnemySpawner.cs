@@ -2,6 +2,7 @@ using UnityEngine;
 using MainCharacterScripts;
 using scriptableObjects;
 using System.Collections;
+using generalScripts;
 
 namespace EnemyScripts
 {
@@ -31,24 +32,17 @@ namespace EnemyScripts
         {
             while (true)
             {
-                
                 yield return new WaitForSeconds(spawnInterval);
-                
-                if (PlayerController.Instance == null)
-                {
-                    yield break;
-                }
 
-                _playerTransform = PlayerController.Instance.transform;
-                
                 Vector3 spawnPosition = _playerTransform.position + (Vector3)(Random.insideUnitCircle.normalized * spawnRadius);
                 IEnemy newEnemy = enemyFactory.CreateMeleeEnemy(spawnPosition);
-
+                
                 if (newEnemy != null)
                 {
                     newEnemy.Initialize(_playerTransform, enemyData);
                 }
             }
         }
+        
     }
 }

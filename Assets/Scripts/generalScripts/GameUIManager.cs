@@ -1,16 +1,12 @@
-using System;
+using MainCharacterScripts;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
-using MainCharacterScripts;
 
 namespace generalScripts
 {
-    // Make this a singleton so it can be easily accessed from other scripts.
     public class GameUIManager : MonoBehaviour
     {
-        public static GameUIManager Instance { get; private set; }
-
         [Header("UI Panels")]
         [SerializeField]
         private GameObject gameplayPanel;
@@ -26,41 +22,37 @@ namespace generalScripts
         private TextMeshProUGUI playerScoreText;
         [SerializeField]
         private TextMeshProUGUI gameOverScoreText;
+        
+        [Header("HUD")]
+        [SerializeField]
+        private TextMeshProUGUI healthText;
         [SerializeField]
         private TextMeshProUGUI timerText;
+        [SerializeField]
+        private TextMeshProUGUI currentScoreText;
 
         private int _currentScore;
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-
-        private void Start()
+        
+        public void InitializeUI()
         {
             _currentScore = 0;
             UpdateScore(_currentScore);
             ShowGameplayUI();
-            
+
             if (JsonSaveManager.Instance != null && !string.IsNullOrEmpty(JsonSaveManager.Instance.CurrentPlayerUsername))
             {
                 SetPlayerName(JsonSaveManager.Instance.CurrentPlayerUsername);
             }
         }
-
+        
         public void Update()
         {
             if (GameManager.Instance != null && timerText != null)
             {
                 timerText.text = GameManager.Instance.GetFormatedTime();
             }
+            
+            currentScoreText.text = $"{_currentScore}";
         }
 
         public void ShowGameplayUI()
@@ -93,6 +85,22 @@ namespace generalScripts
             playerScoreText.text = "Score: " + _currentScore;
         }
         
+        public void UpdateGameOverScore(int score)
+        {
+            if (gameOverPanel != null)
+            {
+                gameOverScoreText.text = "Score: " + score;
+            }
+        }
+        
+        public void UpdateHealth(int health)
+        {
+            if (healthText != null)
+            {
+                healthText.text = "Health: " + health.ToString();
+            }
+        }
+        
         public void OnContinueClicked()
         {
             if (GameManager.Instance != null)
@@ -107,7 +115,6 @@ namespace generalScripts
             {
                 JsonSaveManager.Instance.AddOrUpdateHighScore(JsonSaveManager.Instance.CurrentPlayerUsername, _currentScore);
             }
-            // Reset time scale to ensure the main menu is not paused.
             Time.timeScale = 1f;
             SceneManager.LoadScene(0);
         }
@@ -127,7 +134,7 @@ namespace generalScripts
             {
                 JsonSaveManager.Instance.AddOrUpdateHighScore(JsonSaveManager.Instance.CurrentPlayerUsername, _currentScore);
             }
-            // Ask the GameManager to handle the restart.
+            
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RestartGame();

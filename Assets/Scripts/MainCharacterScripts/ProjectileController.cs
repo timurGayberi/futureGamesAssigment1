@@ -20,6 +20,7 @@ namespace MainCharacterScripts
         [SerializeField] 
         private Rigidbody2D body;
         
+        private bool _hasCollided = false;
         
         public float GetDamage()
         {
