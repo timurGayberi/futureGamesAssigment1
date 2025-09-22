@@ -17,4 +17,4 @@ MonoBehaviour:
   moveSpeed: 2
   damage: 5
   scoreValue: 1
-  attackCooldown: 1
+  attackCooldown: 0.5

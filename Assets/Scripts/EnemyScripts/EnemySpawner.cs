@@ -30,18 +30,27 @@ namespace EnemyScripts
         
         private IEnumerator SpawnEnemies()
         {
-            while (true)
-            {
-                yield return new WaitForSeconds(spawnInterval);
 
-                Vector3 spawnPosition = _playerTransform.position + (Vector3)(Random.insideUnitCircle.normalized * spawnRadius);
-                IEnemy newEnemy = enemyFactory.CreateMeleeEnemy(spawnPosition);
-                
-                if (newEnemy != null)
+            if (_playerTransform != null)
+            {
+                while (true)
                 {
-                    newEnemy.Initialize(_playerTransform, enemyData);
+                    yield return new WaitForSeconds(spawnInterval);
+
+                    Vector3 spawnPosition = _playerTransform.position + (Vector3)(Random.insideUnitCircle.normalized * spawnRadius);
+                    IEnemy newEnemy = enemyFactory.CreateMeleeEnemy(spawnPosition);
+                
+                    if (newEnemy != null)
+                    {
+                        newEnemy.Initialize(_playerTransform, enemyData);
+                    }
                 }
             }
+            else
+            {
+                yield return 0;
+            }
+            
         }
         
     }

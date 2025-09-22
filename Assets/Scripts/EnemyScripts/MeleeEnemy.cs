@@ -42,7 +42,6 @@ namespace EnemyScripts
         public void TakeDamage(float damage)
         {
             health.TakeDamage(damage);
-            //Debug.Log("Enemy got damaged");
         }
 
         public void Die()
@@ -51,6 +50,7 @@ namespace EnemyScripts
 
             float scoreToAdd = DifficultyManager.Instance.GetScoreForEnemy(EnemyType.Melee);
             GameManager.Instance.AddScore((int)scoreToAdd);
+            GameManager.Instance.OnEnemyDestroy(1);
             
             Destroy(gameObject);
         }

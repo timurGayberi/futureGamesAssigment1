@@ -30,13 +30,18 @@ namespace generalScripts
         private TextMeshProUGUI timerText;
         [SerializeField]
         private TextMeshProUGUI currentScoreText;
+        [SerializeField] 
+        private TextMeshProUGUI killCountText;
 
         private int _currentScore;
+        private int _killCount = 1;
         
         public void InitializeUI()
         {
             _currentScore = 0;
+            _killCount = 0;
             UpdateScore(_currentScore);
+            UpdateKillCount(_killCount);
             ShowGameplayUI();
 
             if (JsonSaveManager.Instance != null && !string.IsNullOrEmpty(JsonSaveManager.Instance.CurrentPlayerUsername))
@@ -52,7 +57,8 @@ namespace generalScripts
                 timerText.text = GameManager.Instance.GetFormatedTime();
             }
             
-            currentScoreText.text = $"{_currentScore}";
+            currentScoreText.text = "Current score: " + _currentScore;
+            killCountText.text = "Kill count: " + _killCount;
         }
 
         public void ShowGameplayUI()
@@ -83,6 +89,12 @@ namespace generalScripts
         {
             _currentScore = score;
             playerScoreText.text = "Score: " + _currentScore;
+        }
+
+        public void UpdateKillCount(int killCount)
+        {
+            _killCount = killCount;
+            killCountText.text = "Kill count: " + _killCount;
         }
         
         public void UpdateGameOverScore(int score)

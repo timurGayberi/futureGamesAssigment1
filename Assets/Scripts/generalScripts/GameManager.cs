@@ -20,7 +20,8 @@ namespace generalScripts
         public GameState CurrentGameState { get; private set; }
         
         private float _gameTime;
-        private int _currentScore;
+        private int _currentScore,
+                    _killCount;
 
         private GameUIManager _gameUIManager;
         
@@ -42,6 +43,7 @@ namespace generalScripts
         private void Start()
         {
             SetGameState(GameState.Gameplay);
+            _killCount = 0;
         }
 
         private void Update()
@@ -64,6 +66,16 @@ namespace generalScripts
             if(_gameUIManager != null)
             {
                 _gameUIManager.UpdateScore(_currentScore);
+            }
+        }
+        
+        public void OnEnemyDestroy(int killCount)
+        {
+            _killCount += killCount;
+            if (_gameUIManager != null)
+            {
+                _gameUIManager.UpdateKillCount(_killCount / 2);
+                //Debug.Log(_killCount);
             }
         }
         
@@ -91,6 +103,7 @@ namespace generalScripts
         {
             _gameTime = 0;
             _currentScore = 0;
+            _killCount = 0;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         
