@@ -1,4 +1,3 @@
-using System;
 using MainCharacterScripts;
 using proceduralMaps;
 using UnityEngine;
@@ -19,9 +18,18 @@ namespace generalScripts
 
         public GameState CurrentGameState { get; private set; }
         
+        [Header("Difficulty Settings")]
+        [Tooltip("The number of kills required to activate the DifficultyManager.")]
+        [SerializeField] private int difficultyActivationThreshold ;
+        
+        [Header("References")]
+        [SerializeField] private DifficultyManager difficultyManager;
+        
         private float _gameTime;
         private int _currentScore,
                     _killCount;
+        
+        private bool _difficultyActivated;
 
         private GameUIManager _gameUIManager;
         
@@ -39,11 +47,17 @@ namespace generalScripts
             }
         }
         
-        [Obsolete("Obsolete")]
         private void Start()
         {
+            _gameUIManager = GetComponent<GameUIManager>();
             SetGameState(GameState.Gameplay);
+            _currentScore = 0;
             _killCount = 0;
+            _gameTime = 0;
+            Time.timeScale = 1f;
+            
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            
         }
 
         private void Update()
@@ -53,8 +67,8 @@ namespace generalScripts
                 _gameTime += Time.deltaTime;
             }
         }
+        
 
-        [Obsolete("Obsolete")]
         private void OnDestroy()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -69,18 +83,15 @@ namespace generalScripts
             }
         }
         
-        public void OnEnemyDestroy(int killCount)
+        public void OnEnemyDestroyed(int killCount)
         {
             _killCount += killCount;
             if (_gameUIManager != null)
             {
-                _gameUIManager.UpdateKillCount(_killCount / 2);
-                //Debug.Log(_killCount);
+                _gameUIManager.UpdateKillCount(_killCount/2);
             }
         }
         
-        // ReSharper disable Unity.PerformanceAnalysis
-        [Obsolete("Obsolete")]
         public void TogglePause()
         {
             if (CurrentGameState == GameState.Gameplay)
@@ -93,9 +104,10 @@ namespace generalScripts
             }
         }
 
-        [Obsolete("Obsolete")]
         public void OnPlayerDied()
         {
+            CurrentGameState = GameState.GameOver;
+            Time.timeScale = 0f;
             SetGameState(GameState.GameOver);
         }
 
@@ -105,13 +117,15 @@ namespace generalScripts
             _currentScore = 0;
             _killCount = 0;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            CurrentGameState = GameState.Gameplay;
+            _difficultyActivated = false;
+            Time.timeScale = 1f;
         }
         
-        [Obsolete("Obsolete")]
         private void SetGameState(GameState newState)
         {
             CurrentGameState = newState;
-
+            
             if (_gameUIManager == null)
             {
                 _gameUIManager = FindObjectOfType<GameUIManager>();
@@ -125,25 +139,17 @@ namespace generalScripts
             {
                 case GameState.Gameplay:
                     Time.timeScale = 1;
-                    if (_gameUIManager != null)
-                    {
-                        _gameUIManager.ShowGameplayUI();
-                        _gameUIManager.UpdateScore(_currentScore);
-                    }
+                    _gameUIManager.ShowGameplayUI();
+                    _gameUIManager.UpdateScore(_currentScore);
+                    _gameUIManager.UpdateKillCount(_killCount);
                     break;
                 case GameState.Paused:
                     Time.timeScale = 0;
-                    if (_gameUIManager != null)
-                    {
-                        _gameUIManager.ShowPauseMenu();
-                    }
+                    _gameUIManager.ShowPauseMenu();
                     break;
                 case GameState.GameOver:
-                    if (_gameUIManager != null)
-                    {
-                        _gameUIManager.ShowGameOverMenu();
-                        _gameUIManager.UpdateGameOverScore(_currentScore);
-                    }
+                    _gameUIManager.ShowGameOverMenu();
+                    _gameUIManager.UpdateGameOverScore(_currentScore);
                     break;
                 
                 default:
@@ -153,7 +159,6 @@ namespace generalScripts
             }
         }
 
-        [Obsolete("Obsolete")]
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene.buildIndex == SceneManager.GetActiveScene().buildIndex)
@@ -176,14 +181,20 @@ namespace generalScripts
                 SetGameState(GameState.Gameplay);
             }
         }
-        
         public string GetFormatedTime()
+
         {
+
             int hours = Mathf.FloorToInt(_gameTime / 3600),
+
                 minutes = Mathf.FloorToInt((_gameTime % 3600) / 60),
+
                 seconds = Mathf.FloorToInt((_gameTime % 3600) % 60);
-            
+
+    
+
             return $"{hours:00}:{minutes:00}:{seconds:00}";
+
         }
     }
 }

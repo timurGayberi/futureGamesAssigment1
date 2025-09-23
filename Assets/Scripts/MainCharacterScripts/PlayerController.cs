@@ -36,10 +36,10 @@ namespace MainCharacterScripts
         private void Update()
         {
             var moveInput = KeyboardInputListener.Instance.MoveInput;
-            float strafeInput = KeyboardInputListener.Instance.StrafeInput;
-            float rotationInput = KeyboardInputListener.Instance.RotationInput;
+            var strafeInput = KeyboardInputListener.Instance.StrafeInput;
+            var rotationInput = KeyboardInputListener.Instance.RotationInput;
             
-            Vector2 relativeMovement = (Vector2)transform.up * moveInput.y + (Vector2)transform.right * strafeInput;
+            var relativeMovement = (Vector2)transform.up * moveInput.y + (Vector2)transform.right * strafeInput;
             
             if (relativeMovement.magnitude > 1f)
             {

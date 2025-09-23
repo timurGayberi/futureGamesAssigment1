@@ -8,7 +8,6 @@ namespace MainCharacterScripts
     {
         [Header("Core Stats")]
         public float maxHealth = 100f;
-        //public float currentHealth;
         public float moveSpeed = 5f;
         public float rotationSpeed = 100f;
 

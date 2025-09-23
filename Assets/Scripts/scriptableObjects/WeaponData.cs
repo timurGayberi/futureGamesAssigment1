@@ -7,13 +7,15 @@ namespace scriptableObjects
     {
         [Header("Weapon Identification")] 
         public string weaponName;
-        public GameObject projectilePrefab;
+        public GameObject projectilePrefab,
+                          explosivePrefab;
 
         [Header("Firing Properties")]
         public float fireRate,
                      projectileSpeed,
                      projectileGetDestroyTime,
-                     projectileDamage;
+                     projectileDamage,
+                     areaDamageRadius;
 
         [Header("Ammo Properties")] 
         public bool isInfinite,

@@ -30,10 +30,10 @@ namespace GeneralScripts
             RotationInput = 0f;
             IsEscapePressed = false;
             
-            float verticalInput = Input.GetAxisRaw("Vertical");
+            var verticalInput = Input.GetAxisRaw("Vertical");
             MoveInput = new Vector2(0, verticalInput);
             
-            float strafeInput = 0f;
+            var strafeInput = 0f;
             if (Input.GetKey(KeyCode.D))
             {
                 strafeInput = 1f;
@@ -44,7 +44,7 @@ namespace GeneralScripts
             }
             StrafeInput = strafeInput;
             
-            float rotationInput = 0f;
+            var rotationInput = 0f;
             if (Input.GetKey(KeyCode.E))
             {
                 rotationInput = -1f;

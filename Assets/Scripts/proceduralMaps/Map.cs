@@ -57,12 +57,12 @@ namespace proceduralMaps
             //Generating the heat map
             HeatMap = NoiseGenerator.Generate(width, height, scale, offset, heatWaves);
             
-            Color[] pixels = new Color[width * height];
-            int i = 0;
+            var pixels = new Color[width * height];
+            var i = 0;
 
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (var x = 0; x < width; x++)
                 {
                     switch (displayType)
                     {
@@ -78,11 +78,11 @@ namespace proceduralMaps
 
                         case MapDisplay.Biome:
                         {
-                            BiomePreset biome = GetBiome(HeightMap[x, y], MoistureMap[x, y], HeatMap[x, y]);
+                            var biome = GetBiome(HeightMap[x, y], MoistureMap[x, y], HeatMap[x, y]);
                             pixels[i] = biome.debugColor;
 
                             // We're now instantiating tiles relative to the chunk's origin
-                            GameObject tile = Instantiate(tilePrefab, new Vector3(x + offset.x, y + offset.y, 0), Quaternion.identity, transform);
+                            var tile = Instantiate(tilePrefab, new Vector3(x + offset.x, y + offset.y, 0), Quaternion.identity, transform);
                             tile.GetComponent<SpriteRenderer>().sprite = biome.GetTileSprite();
                             
                             break;
@@ -100,7 +100,7 @@ namespace proceduralMaps
             
             if (Application.isEditor)
             {
-                Texture2D tex = new Texture2D(width, height);
+                var tex = new Texture2D(width, height);
                 tex.SetPixels(pixels);
                 tex.filterMode = FilterMode.Point;
                 tex.Apply();
@@ -115,9 +115,9 @@ namespace proceduralMaps
         BiomePreset GetBiome(float height, float moisture, float heat)
         {
             BiomePreset biomeToReturn = null;
-            List<BiomePreset> tempBiomes = new List<BiomePreset>();
+            var tempBiomes = new List<BiomePreset>();
 
-            foreach (BiomePreset biome in biomes)
+            foreach (var biome in biomes)
             {
                 if (biome.MatchCondition(height, moisture, heat))
                 {
@@ -125,11 +125,11 @@ namespace proceduralMaps
                 }
             }
 
-            float curValue = 0.0f;
+            var curValue = 0.0f;
 
-            foreach (BiomePreset biome in tempBiomes)
+            foreach (var biome in tempBiomes)
             {
-                float diffValue = (height - biome.minHeight) + (moisture - biome.minMoisture) +  (heat - biome.minHeat);
+                var diffValue = (height - biome.minHeight) + (moisture - biome.minMoisture) +  (heat - biome.minHeat);
 
                 if (biomeToReturn == null)
                 {

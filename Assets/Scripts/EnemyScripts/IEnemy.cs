@@ -1,15 +1,8 @@
-using scriptableObjects;
 using UnityEngine;
+using scriptableObjects;
 
 namespace EnemyScripts
 {
-    public enum EnemyType
-    {
-        Melee,
-        Ranged,
-        //Others to come...
-    }
-    
     public interface IEnemy 
     {
         void Initialize(Transform playerTransform, EnemyData enemyData);

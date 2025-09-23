@@ -35,7 +35,7 @@ namespace generalScripts
 
         private void UpdateUI()
         {
-            foreach (GameObject panel in panels)
+            foreach (var panel in panels)
             {
                 panel.SetActive(false);
             }
@@ -78,7 +78,7 @@ namespace generalScripts
 
         public void OnStartGameConfirmed()
         {
-            string playerName = nameInputField.text;
+            var playerName = nameInputField.text;
 
             if (string.IsNullOrEmpty(playerName))
             {

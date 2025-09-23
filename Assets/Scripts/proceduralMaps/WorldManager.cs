@@ -37,7 +37,7 @@ namespace proceduralMaps
         [Obsolete("Obsolete")]
         private void Start()
         {
-            PlayerController newPlayer = FindObjectOfType<PlayerController>();
+            var newPlayer = FindObjectOfType<PlayerController>();
             if (newPlayer != null)
             {
                 ResetWorld(newPlayer.transform);
@@ -51,7 +51,7 @@ namespace proceduralMaps
                 return;
             }
 
-            Vector2Int newChunk = GetChunkCoordinates(_playerTransform.position);
+            var newChunk = GetChunkCoordinates(_playerTransform.position);
             if (newChunk != _currentPlayerChunk)
             {
                 _currentPlayerChunk = newChunk;
@@ -79,13 +79,13 @@ namespace proceduralMaps
 
         private void GenerateWorld()
         {
-            HashSet<Vector2Int> chunksToKeep = new HashSet<Vector2Int>();
+            var chunksToKeep = new HashSet<Vector2Int>();
             
-            for (int x = -viewDistance; x <= viewDistance; x++)
+            for (var x = -viewDistance; x <= viewDistance; x++)
             {
-                for (int y = -viewDistance; y <= viewDistance; y++)
+                for (var y = -viewDistance; y <= viewDistance; y++)
                 {
-                    Vector2Int chunkCoords = new Vector2Int(_currentPlayerChunk.x + x, _currentPlayerChunk.y + y);
+                    var chunkCoords = new Vector2Int(_currentPlayerChunk.x + x, _currentPlayerChunk.y + y);
                     chunksToKeep.Add(chunkCoords);
 
                     if (!_loadedChunks.ContainsKey(chunkCoords))
@@ -95,7 +95,7 @@ namespace proceduralMaps
                 }
             }
             
-            List<Vector2Int> chunksToUnload = new List<Vector2Int>();
+            var chunksToUnload = new List<Vector2Int>();
             foreach (var chunk in _loadedChunks)
             {
                 if (!chunksToKeep.Contains(chunk.Key))
@@ -117,10 +117,10 @@ namespace proceduralMaps
                 return;
             }
             
-            GameObject chunkInstance = Instantiate(chunkPrefab, new Vector3(coords.x * chunkWidth, coords.y * chunkHeight, 0), Quaternion.identity);
+            var chunkInstance = Instantiate(chunkPrefab, new Vector3(coords.x * chunkWidth, coords.y * chunkHeight, 0), Quaternion.identity);
             chunkInstance.name = $"Chunk_{coords.x}_{coords.y}";
             
-            Map mapComponent = chunkInstance.GetComponent<Map>();
+            var mapComponent = chunkInstance.GetComponent<Map>();
             if (mapComponent == null)
             {
                 return;
@@ -137,7 +137,7 @@ namespace proceduralMaps
 
         private void UnloadChunk(Vector2Int coords)
         {
-            if (_loadedChunks.TryGetValue(coords, out GameObject chunk))
+            if (_loadedChunks.TryGetValue(coords, out var chunk))
             {
                 Destroy(chunk);
                 _loadedChunks.Remove(coords);
@@ -146,8 +146,8 @@ namespace proceduralMaps
         
         private Vector2Int GetChunkCoordinates(Vector3 position)
         {
-            int chunkX = Mathf.FloorToInt(position.x / chunkWidth);
-            int chunkY = Mathf.FloorToInt(position.y / chunkHeight);
+            var chunkX = Mathf.FloorToInt(position.x / chunkWidth);
+            var chunkY = Mathf.FloorToInt(position.y / chunkHeight);
             return new Vector2Int(chunkX, chunkY);
         }
     }

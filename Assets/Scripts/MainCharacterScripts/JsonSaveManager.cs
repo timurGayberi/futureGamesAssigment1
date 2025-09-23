@@ -58,7 +58,7 @@ namespace MainCharacterScripts
     {
         if (File.Exists(saveFilePath))
         {
-            string json = File.ReadAllText(saveFilePath);
+            var json = File.ReadAllText(saveFilePath);
             leaderboard = JsonUtility.FromJson<PlayerLeaderboard>(json);
         }
         else
@@ -76,7 +76,7 @@ namespace MainCharacterScripts
         // Sort the players by high score before saving.
         leaderboard.players = leaderboard.players.OrderByDescending(p => p.highScore).ToList();
         
-        string json = JsonUtility.ToJson(leaderboard, true);
+        var json = JsonUtility.ToJson(leaderboard, true);
         File.WriteAllText(saveFilePath, json);
     }
 

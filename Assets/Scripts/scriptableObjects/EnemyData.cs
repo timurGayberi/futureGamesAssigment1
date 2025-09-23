@@ -1,24 +1,21 @@
-using EnemyScripts;
 using UnityEngine;
+using EnemyScripts;
+using scriptableObjects;
 
-namespace scriptableObjects
+[CreateAssetMenu(fileName = "New Enemy Data", menuName = "Enemy/Enemy Data")]
+public class EnemyData : ScriptableObject
 {
-    [CreateAssetMenu(fileName = "New enemy data", menuName = "Enemy/Enemy data")]
-    public class EnemyData : ScriptableObject
-    {
-        [Header("Enemy type")]
-        public EnemyType enemyType;
-        //public bool isRanged;
-        
-        [Header("Enemy stats")]
-        public float maxHealth,
-                     moveSpeed,
-                     damage;
-        
-        public int scoreValue;
+    [Header("Enemy Type and Scoring")]
+    public EnemyType enemyType;
+    public int scoreValue;
 
-        [Header("Behaviour")] 
-        public float attackCooldown;
-
-    }
+    [Header("Base Stats")]
+    public float maxHealth = 10f;
+    public float damage = 5f;
+    public float moveSpeed = 2f;
+    
+    [Header("Ranged Only")]
+    public float attackCooldown = 1f;
+    public float fireRange = 10f;
+    public WeaponData weaponData;
 }

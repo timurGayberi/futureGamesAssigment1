@@ -20,7 +20,7 @@ namespace MainCharacterScripts
         [SerializeField] 
         private Rigidbody2D body;
         
-        private bool _hasCollided = false;
+        private bool _hasCollided;
         
         public float GetDamage()
         {
@@ -40,9 +40,9 @@ namespace MainCharacterScripts
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Enemy"))
+            if (other.CompareTag("Enemy") || other.CompareTag("EnemyProjectile"))
             {
-                Health enemyHealth = other.GetComponent<Health>();
+                var enemyHealth = other.GetComponent<Health>();
                 if (enemyHealth != null)
                 {
                     enemyHealth.TakeDamage(data.projectileDamage);
@@ -60,13 +60,13 @@ namespace MainCharacterScripts
 
         private void ApplyAreaDamage()
         {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, areaDamageRadius);
+            var colliders = Physics2D.OverlapCircleAll(transform.position, areaDamageRadius);
 
-            foreach (Collider2D hit in colliders)
+            foreach (var hit in colliders)
             {
                 if (hit.CompareTag("Enemy"))
                 {
-                    Health enemyHealth = hit.GetComponent<Health>();
+                    var enemyHealth = hit.GetComponent<Health>();
                     if (enemyHealth != null)
                     {
                         enemyHealth.TakeDamage(data.projectileDamage);

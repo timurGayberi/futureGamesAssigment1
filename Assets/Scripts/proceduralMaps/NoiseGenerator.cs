@@ -6,11 +6,11 @@ namespace proceduralMaps
     {
         public static float[,] Generate(int width, int height, float scale, Vector2 offset, Wave[] waves)
         {
-            float[,] noiseMap = new float[width, height];
+            var noiseMap = new float[width, height];
 
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (var y = 0; y < height; y++)
                 {
                     float sampleX = (float)x * scale + offset.x,
                           sampleY = (float)y * scale + offset.y,
