@@ -1,6 +1,6 @@
 using System;
+using generalScripts;
 using UnityEngine;
-using GeneralScripts; 
 
 namespace MainCharacterScripts
 {
@@ -11,6 +11,7 @@ namespace MainCharacterScripts
         [Header("Component References")]
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerShooting playerShooting;
+        
 
         [Header("Stats")]
         [SerializeField] private PlayerStats playerStats;

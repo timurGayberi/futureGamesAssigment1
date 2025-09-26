@@ -12,27 +12,20 @@ namespace generalScripts
         [SerializeField]
         private float currentHealth;
         
-        [Header("UI References")]
-        [SerializeField]
-        private TextMeshProUGUI healthText;
-        
         [Header("Events")]
         public UnityEvent onTakeDamage;
         public UnityEvent onDie;
-
         private void Awake()
         {
             currentHealth = maxHealth;
             UpdateHealthUI();
         }
-
         public void SetMaxHealth(float newMaxHealth)
         {
             maxHealth = newMaxHealth;
             currentHealth = maxHealth;
             UpdateHealthUI();
         }
-
         public void TakeDamage(float damageAmount)
         {
             currentHealth -= damageAmount;
@@ -46,16 +39,21 @@ namespace generalScripts
             }
         }
         
+        /*public void Heal(float amount)
+        {
+            currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+            UpdateHealthUI();
+        }*/
+        
         private void Die()
         {
             onDie.Invoke();
         }
-
         private void UpdateHealthUI()
         {
-            if (healthText != null)
+            if (gameObject.CompareTag("Player") && GameManager.Instance != null)
             {
-                healthText.text = "Health: " + Mathf.Max(0, currentHealth).ToString("F0");
+                GameManager.Instance.UpdateHealth(currentHealth);
             }
         }
     }

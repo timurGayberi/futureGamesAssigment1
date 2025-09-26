@@ -4,86 +4,23 @@ using scriptableObjects;
 
 namespace EnemyScripts
 {
-    public class MeleeEnemy : MonoBehaviour, IEnemy
+    public class MeleeEnemy : EnemyBase
     {
-        private Transform _playerTransform;
-        private EnemyData _enemyData;
-        private float _lastAttackTime;
-        
-        [Header("Component References")]
-        [SerializeField]
-        private Health health;
-
-        public void Initialize(Transform playerTransform, EnemyData enemyData)
+        protected override void Update()
         {
-            _playerTransform = playerTransform;
-            _enemyData = enemyData;
-            health.SetMaxHealth(enemyData.maxHealth);
-            health.onDie.AddListener(Die);
-        }
+            base.Update(); 
 
-        private void Update()
-        {
-            if (_playerTransform == null)
+            if (playerTransform == null)
             {
                 return;
             }
-
+            
             transform.position = Vector2.MoveTowards
             (
                 transform.position,
-                _playerTransform.position,
-                _enemyData.moveSpeed * Time.deltaTime
+                playerTransform.position,
+                enemyData.moveSpeed * Time.deltaTime
             );
-        }
-
-        public void TakeDamage(float damage)
-        {
-            health.TakeDamage(damage);
-        }
-
-        public void Die()
-        {
-
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.AddScore((int)_enemyData.scoreValue);
-                GameManager.Instance.OnEnemyDestroyed(1);
-            }
-            
-            //DifficultyManager.Instance.EnemyKilled();
-            
-            Destroy(gameObject);
-        }
-
-        private void DealDamageToPlayer(Collider2D other)
-        {
-            var playerHealth = other.GetComponent<Health>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(_enemyData.damage);
-            }
-        }
-        
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                DealDamageToPlayer(other);
-                _lastAttackTime = Time.time;
-            }
-        }
-        
-        private void OnTriggerStay2D(Collider2D other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                if (Time.time >= _lastAttackTime + _enemyData.attackCooldown)
-                {
-                    DealDamageToPlayer(other);
-                    _lastAttackTime = Time.time;
-                }
-            }
         }
     }
 }

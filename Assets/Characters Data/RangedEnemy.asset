@@ -20,3 +20,7 @@ MonoBehaviour:
   attackCooldown: 0.5
   fireRange: 10
   weaponData: {fileID: 11400000, guid: 09841d05ac4b4514cbac8c83fc18dd76, type: 2}
+  overallNoDropChance: 0
+  dropConfigurations:
+  - itemToDropPrefab: {fileID: 2534669727115932143, guid: f6fb13ab66da44b40a05b8737c6aafff, type: 3}
+    dropWeight: 1

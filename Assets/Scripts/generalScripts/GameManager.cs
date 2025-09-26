@@ -1,5 +1,6 @@
 using MainCharacterScripts;
 using proceduralMaps;
+using scriptableObjects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,19 +16,18 @@ namespace generalScripts
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
-
         public GameState CurrentGameState { get; private set; }
         
         [Header("Difficulty Settings")]
-        [Tooltip("The number of kills required to activate the DifficultyManager.")]
         [SerializeField] private int difficultyActivationThreshold ;
         
         [Header("References")]
         [SerializeField] private DifficultyManager difficultyManager;
         
-        private float _gameTime;
+        private float _gameTime,
+                 _currentHealth;
         private int _currentScore,
-                    _killCount;
+                       _killCount;
         
         private bool _difficultyActivated;
 
@@ -55,9 +55,6 @@ namespace generalScripts
             _killCount = 0;
             _gameTime = 0;
             Time.timeScale = 1f;
-            
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            
         }
 
         private void Update()
@@ -67,13 +64,10 @@ namespace generalScripts
                 _gameTime += Time.deltaTime;
             }
         }
-        
-
         private void OnDestroy()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-
         public void AddScore(int score)
         {
             _currentScore += score;
@@ -82,13 +76,20 @@ namespace generalScripts
                 _gameUIManager.UpdateScore(_currentScore);
             }
         }
-        
         public void OnEnemyDestroyed(int killCount)
         {
             _killCount += killCount;
             if (_gameUIManager != null)
             {
                 _gameUIManager.UpdateKillCount(_killCount/2);
+            }
+        }
+        public void UpdateHealth(float newHealth)
+        {
+            _currentHealth = newHealth;
+            if (_gameUIManager != null)
+            {
+                _gameUIManager.UpdateHealth(newHealth);
             }
         }
         
@@ -190,8 +191,7 @@ namespace generalScripts
                 minutes = Mathf.FloorToInt((_gameTime % 3600) / 60),
 
                 seconds = Mathf.FloorToInt((_gameTime % 3600) % 60);
-
-    
+            
 
             return $"{hours:00}:{minutes:00}:{seconds:00}";
 

@@ -14,15 +14,12 @@ namespace EnemyScripts
         {
             _data = data;
             
-            // Destroy the projectile after a set time to prevent it from flying forever.
             Destroy(gameObject, _data.projectileGetDestroyTime);
         }
 
         private void Update()
         {
-            // Move the projectile forward based on its own rotation.
-            // The RangedEnemy is responsible for setting the initial rotation, so we use `transform.up`.
-            transform.Translate(transform.up * _data.projectileSpeed * Time.deltaTime, Space.World);
+            transform.Translate(transform.up * (_data.projectileSpeed * Time.deltaTime), Space.World);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -33,14 +30,13 @@ namespace EnemyScripts
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(_data.projectileDamage);
-                    Debug.Log("Player shot!");
+                    //Debug.Log("Player shot!");
                 }
                 
                 Destroy(gameObject);
             }
             else if (other.CompareTag("projectile"))
             {
-                // This is an additional check for collisions between projectiles.
                 Destroy(other.gameObject);
                 Destroy(gameObject);
             }

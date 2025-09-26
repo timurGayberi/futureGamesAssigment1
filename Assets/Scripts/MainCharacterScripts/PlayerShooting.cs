@@ -1,6 +1,6 @@
+using generalScripts;
 using UnityEngine;
 using scriptableObjects;
-using GeneralScripts;
 
 namespace MainCharacterScripts
 {

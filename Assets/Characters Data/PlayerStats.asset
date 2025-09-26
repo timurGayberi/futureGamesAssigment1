@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::MainCharacterScripts.PlayerStats
   maxHealth: 100
-  currentHealth: 100
   moveSpeed: 5
   rotationSpeed: 100
+  currentLevel: 0
   fireRate: 10
   projectileDamage: 10

@@ -24,6 +24,8 @@ namespace EnemyScripts
         private float spawnRadius; 
         
         private Transform _playerTransform;
+        private int _enemiesAliveCount = 0; 
+        private Coroutine _spawnCoroutine;
 
         private void Start()
         {
@@ -40,13 +42,25 @@ namespace EnemyScripts
             StartCoroutine(SpawnEnemies());
             
         }
+        public void Initialize(Transform player)
+        {
+            if (_playerTransform == null)
+            {
+                _playerTransform = player;
+                
+                if (_spawnCoroutine != null)
+                {
+                    StopCoroutine(_spawnCoroutine);
+                }
+                _spawnCoroutine = StartCoroutine(SpawnEnemies());
+            }
+        }
         
         private IEnumerator SpawnEnemies()
         {
-            
             if (_playerTransform == null)
             {
-                Debug.LogError("Player transform not found. Spawner cannot run.");
+                Debug.LogError("Player transform not set. Spawner cannot run.");
                 yield break;
             }
 
@@ -55,8 +69,8 @@ namespace EnemyScripts
                 Debug.LogError("Enemy data list is empty! Cannot spawn any enemies.");
                 yield break;
             }
-
-            while (GameManager.Instance.CurrentGameState == GameState.Gameplay)
+            
+            while (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Gameplay)
             {
                 yield return new WaitForSeconds(spawnInterval);
                 
@@ -65,9 +79,9 @@ namespace EnemyScripts
                 EnemyData enemyData = enemyDataList[Random.Range(0, enemyDataList.Count)];
 
                 IEnemy newEnemy = null;
-
                  
                 EnemyType type = enemyData.enemyType;
+                
                 if (type == EnemyType.Melee)
                 {
                     newEnemy = enemyFactory.CreateMeleeEnemy(spawnPosition, enemyData, _playerTransform);
@@ -81,8 +95,16 @@ namespace EnemyScripts
                 {
                     Debug.LogWarning("Failed to spawn an enemy. Check if the enemyData assets are assigned and the factory is working correctly.");
                 }
+                else
+                {
+                    _enemiesAliveCount++;
+                }
 
             }
+        }
+        public void OnEnemyDestroyed()
+        {
+            _enemiesAliveCount--;
         }
         
     }

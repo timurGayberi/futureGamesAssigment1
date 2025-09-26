@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GeneralScripts
+namespace generalScripts
 {
     public class KeyboardInputListener : MonoBehaviour
     {
