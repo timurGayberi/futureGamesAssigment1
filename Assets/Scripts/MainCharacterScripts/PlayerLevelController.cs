@@ -1,39 +1,110 @@
-using System;
-using Collectibles;
 using generalScripts;
 using UnityEngine;
+using System;
 
 namespace MainCharacterScripts
 {
     public class PlayerLevelController : MonoBehaviour
     {
-        private GameUIManager _gameUIManager;
-        private Droplet _droplet;
+        public static PlayerLevelController Instance {get; private set;}
+        
+        [Header("Current stats")]
+        [SerializeField]
+        private int currentLevel = 0;
+        [SerializeField]
+        private float currentXp = 0;
+        
+        private GameUIManager _uiManager;
+
+        private const float BaseXp = 5f;
+
+        private const float XpPower = 2f;
+
+        private float _xpToNextLevel,
+                      _xpInCurrentLevel;
 
         private void Awake()
         {
-            DontDestroyOnLoad(this);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
-        [Obsolete("Obsolete")]
         private void Start()
         {
-            if (_droplet == null)
+            if (_uiManager == null)
             {
-                _droplet = GetComponent<Droplet>();
+                _uiManager = FindObjectOfType<GameUIManager>();
             }
             
-            if (_gameUIManager == null)
+            _xpToNextLevel = GetRequiredXpForLevel(currentLevel);
+            //UpdateUI();
+        }
+
+        private float GetRequiredXpToReachLevel(int level)
+        {
+            if (level <= 0) return 0f;
+            
+            return BaseXp * (float)Math.Pow(level, XpPower);
+        }
+
+        private float GetRequiredXpForLevel(int level)
+        {
+            var xpToStartNext = GetRequiredXpToReachLevel(level + 1);
+            var xpToStartCurrent = GetRequiredXpToReachLevel(level);
+            return xpToStartCurrent + xpToStartNext;
+        }
+        
+        public void AddExperience(float amount)
+        {
+            if (amount <= 0) return;
+            
+            currentXp += amount;
+            _xpInCurrentLevel += amount;
+            
+            Debug.Log($"Gained {amount} XP. Total XP: {currentXp}");
+
+            CheckForLevelUp();
+            UpdateUI();
+        }
+
+        private void CheckForLevelUp()
+        {
+            if (_xpInCurrentLevel >= _xpToNextLevel)
             {
-                _gameUIManager = FindObjectOfType<GameUIManager>();
+                var remainingXp = _xpInCurrentLevel - _xpToNextLevel;
+                
+                currentLevel++;
+                
+                Debug.Log($"Level {currentLevel} has been upgraded.");
+                
+                _xpToNextLevel = GetRequiredXpForLevel(currentLevel);
+                
+                _xpInCurrentLevel = remainingXp;
+                
+                CheckForLevelUp();
             }
         }
 
-        public void UpdateLevel(int value)
+        private void UpdateUI()
         {
-            Debug.Log("Level Up!");
-            _gameUIManager.UpdateLevel(value);
+            if (_uiManager == null) return;
             
+            var progression = _xpInCurrentLevel / _xpToNextLevel;
+            
+            _uiManager.UpdateLevelDisplay
+            (
+                currentLevel,
+                progression,
+                (int) _xpInCurrentLevel,
+                (int) _xpToNextLevel
+            );
         }
     }
 }

@@ -1,9 +1,9 @@
-using Collectibles;
+using System;
 using MainCharacterScripts;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-
 
 namespace generalScripts
 {
@@ -41,10 +41,10 @@ namespace generalScripts
         [SerializeField]
         private TextMeshProUGUI levelText;
         [SerializeField]
-        private GameObject slider;
+        private TextMeshProUGUI xpProgressText;
+        [SerializeField]
+        private Slider slider;
         
-        private Droplet _droplet;
-
         private int _currentScore,
                     _killCount;
                     
@@ -64,6 +64,10 @@ namespace generalScripts
             {
                 SetPlayerName(JsonSaveManager.Instance.CurrentPlayerUsername);
             }
+        }
+        private void Start()
+        {
+            xpProgressText.text = "0 / 0 XP";
         }
         
         public void Update()
@@ -114,18 +118,32 @@ namespace generalScripts
             _currentHealth = health;
             healthText.text = "Health: " + Mathf.Max(0, _currentHealth).ToString("F0"); 
         }
-
-        private void UpdateLevelSlider(){}
-
+        
         public void UpdateKillCount(int killCount)
         {
             _killCount = killCount;
             killCountText.text = "Kill count: " + _killCount;
         }
-
-        public void UpdateLevel(int value)
+        
+        //Level up and XP parts.
+        public void UpdateLevelDisplay(int level, float progression, int currentXp, int requiredXp)
         {
-            levelText.text = "Level:" + value;
+            if (levelText != null)
+            {
+                levelText.text = $"Level:  {level}";
+            }
+
+            if (slider != null)
+            {
+                slider.maxValue = requiredXp;
+                
+                slider.value = currentXp;
+            }
+
+            if (xpProgressText != null)
+            {
+                xpProgressText.text = $"{currentXp} / {requiredXp} XP";
+            }
         }
         
         public void UpdateGameOverScore(int score)
@@ -135,8 +153,6 @@ namespace generalScripts
                 gameOverScoreText.text = "Score: " + score;
             }
         }
-        
-        
         public void OnContinueClicked()
         {
             if (GameManager.Instance != null)
@@ -163,7 +179,6 @@ namespace generalScripts
             }
             Application.Quit();
         }
-
         public void OnRestartGameClicked()
         {
             if (JsonSaveManager.Instance != null)

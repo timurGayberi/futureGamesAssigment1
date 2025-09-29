@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using TMPro;
 
 namespace generalScripts
 {
@@ -26,6 +25,30 @@ namespace generalScripts
             currentHealth = maxHealth;
             UpdateHealthUI();
         }
+        public void Heal(int amount)
+        {
+            var floatAmount = (float)amount;
+
+            if (currentHealth >= maxHealth) return;
+
+            var hpValueToAdd = 0f;
+
+            if (currentHealth <= 100f)
+            {
+                hpValueToAdd = maxHealth -  currentHealth;
+            }
+            
+            else if (currentHealth < (maxHealth - floatAmount))
+            {
+                hpValueToAdd = floatAmount;
+            }
+            
+            currentHealth = Mathf.Min(currentHealth + hpValueToAdd, maxHealth);
+            
+            Debug.Log($"Player healed {hpValueToAdd:F1} HP. Current HP: {currentHealth:F1}");
+            UpdateHealthUI();
+        }
+        
         public void TakeDamage(float damageAmount)
         {
             currentHealth -= damageAmount;
@@ -38,13 +61,6 @@ namespace generalScripts
                 Die();
             }
         }
-        
-        /*public void Heal(float amount)
-        {
-            currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
-            UpdateHealthUI();
-        }*/
-        
         private void Die()
         {
             onDie.Invoke();

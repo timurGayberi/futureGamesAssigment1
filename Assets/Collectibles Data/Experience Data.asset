@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b758a96b41238543add150d5fb6a1ad, type: 3}
+  m_Name: Experience Data
+  m_EditorClassIdentifier: Assembly-CSharp::Collectibles.ExperienceCollectibleData
+  collectiblePrefab: {fileID: 2534669727115932143, guid: f6fb13ab66da44b40a05b8737c6aafff, type: 3}
+  despawnTime: 7
+  collectSound: {fileID: 0}
+  expAmount: 10
