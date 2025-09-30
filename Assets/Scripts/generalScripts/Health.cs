@@ -27,25 +27,15 @@ namespace generalScripts
         }
         public void Heal(int amount)
         {
-            var floatAmount = (float)amount;
-
             if (currentHealth >= maxHealth) return;
-
-            var hpValueToAdd = 0f;
-
-            if (currentHealth <= 100f)
-            {
-                hpValueToAdd = maxHealth -  currentHealth;
-            }
             
-            else if (currentHealth < (maxHealth - floatAmount))
-            {
-                hpValueToAdd = floatAmount;
-            }
+            float startingHealth = currentHealth;
             
-            currentHealth = Mathf.Min(currentHealth + hpValueToAdd, maxHealth);
+            currentHealth = Mathf.Min(currentHealth + (float)amount, maxHealth);
             
-            Debug.Log($"Player healed {hpValueToAdd:F1} HP. Current HP: {currentHealth:F1}");
+            float actualHealth = currentHealth - startingHealth;
+            
+            Debug.Log($"Player healed {amount:F1} HP. Current HP: {actualHealth:F1}");
             UpdateHealthUI();
         }
         

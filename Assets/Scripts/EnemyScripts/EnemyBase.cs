@@ -23,6 +23,7 @@ namespace EnemyScripts
             {
                 health.SetMaxHealth(enemyData.maxHealth);
                 health.onDie.AddListener(Die);
+                health.onDie.RemoveAllListeners();
             }
             else
             {
@@ -30,10 +31,10 @@ namespace EnemyScripts
             }
         }
         
-        public void TakeDamage(float damage)
+        /*public void TakeDamage(float damage)
         {
             health.TakeDamage(damage);
-        }
+        }*/
         
         public void Die()
         {
@@ -78,7 +79,7 @@ namespace EnemyScripts
             
             int randomNumber = Random.Range(1, totalWeight + 1);
             
-            DropConfiguration selectedDrop = new DropConfiguration();
+            DropConfiguration selectedDrop = new DropConfiguration(); 
             
             int currentWeight = 0;
             

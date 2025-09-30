@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Health replenish
   m_EditorClassIdentifier: Assembly-CSharp::Collectibles.HealthReplenishCollectible
   collectiblePrefab: {fileID: 8361548937060142257, guid: ecb9c0870f774a24694e8eaa89031542, type: 3}
-  despawnTime: 5
+  despawnTime: 10
   collectSound: {fileID: 0}
   healthReplenishAmount: 25
