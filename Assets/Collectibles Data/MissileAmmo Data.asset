@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6c1a5fa37b3eb148a6afc56ea82019b, type: 3}
+  m_Name: MissileAmmo Data
+  m_EditorClassIdentifier: Assembly-CSharp::Collectibles.MissileCollectible
+  collectiblePrefab: {fileID: 3255752594880339991, guid: 9b5167097f7065f42ad35834bb630abb, type: 3}
+  despawnTime: 8
+  collectSound: {fileID: 0}
+  ammoAmount: 1

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Experience Data
   m_EditorClassIdentifier: Assembly-CSharp::Collectibles.ExperienceCollectibleData
   collectiblePrefab: {fileID: 2534669727115932143, guid: f6fb13ab66da44b40a05b8737c6aafff, type: 3}
-  despawnTime: 1
+  despawnTime: 10
   collectSound: {fileID: 0}
   expAmount: 10
