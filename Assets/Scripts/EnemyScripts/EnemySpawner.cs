@@ -12,11 +12,6 @@ namespace EnemyScripts
         [Header("Factory Reference")]
         [SerializeField] private EnemyFactory enemyFactory;
         
-        [Header("Enemy Data")]
-        [Tooltip("Add all enemy data assets you want to spawn in this list.")]
-        [SerializeField]
-        private List<EnemyData> enemyDataList;
-        
         [Header("Spawn Settings")]
         [SerializeField]
         public float spawnInterval;
@@ -34,13 +29,16 @@ namespace EnemyScripts
                 return;
             }
 
+            if (DifficultyManager.Instance == null)
+            {
+                return;
+            }
+
             if (PlayerController.Instance != null)
             {
                 _playerTransform = PlayerController.Instance.transform;
+                StartCoroutine(SpawnEnemies());
             }
-            
-            StartCoroutine(SpawnEnemies());
-            
         }
         public void Initialize(Transform player)
         {
@@ -63,29 +61,33 @@ namespace EnemyScripts
                 Debug.LogError("Player transform not set. Spawner cannot run.");
                 yield break;
             }
-
-            if (enemyDataList == null || enemyDataList.Count == 0)
-            {
-                Debug.LogError("Enemy data list is empty! Cannot spawn any enemies.");
-                yield break;
-            }
             
             while (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Gameplay)
             {
-                yield return new WaitForSeconds(spawnInterval);
+                var rateMultiplier = DifficultyManager.Instance.GetCurrentSpawnRateMultiplier();
+                var actualSpawnInterval = spawnInterval / rateMultiplier;
                 
-                Vector3 spawnPosition = _playerTransform.position + (Vector3)(Random.insideUnitSphere.normalized * spawnRadius);
+                yield return new WaitForSeconds(spawnInterval);
 
-                EnemyData enemyData = enemyDataList[Random.Range(0, enemyDataList.Count)];
+                List<EnemyData> availableEnemies = DifficultyManager.Instance.GetAvailableEnemyTypes();
+
+                if (availableEnemies.Count == 0)
+                {
+                    continue;
+                }
+                
+                var spawnPosition = _playerTransform.position + (Vector3)(Random.insideUnitSphere.normalized * spawnRadius);
+                
+                EnemyData enemyData = availableEnemies[Random.Range(0, availableEnemies.Count)];
 
                 IEnemy newEnemy = null;
-                 
                 EnemyType type = enemyData.enemyType;
-                
+
                 if (type == EnemyType.Melee)
                 {
                     newEnemy = enemyFactory.CreateMeleeEnemy(spawnPosition, enemyData, _playerTransform);
                 }
+
                 else if (type == EnemyType.Ranged)
                 {
                     newEnemy = enemyFactory.CreateRangedEnemy(spawnPosition, enemyData, _playerTransform);
@@ -93,7 +95,7 @@ namespace EnemyScripts
 
                 if (newEnemy == null)
                 {
-                    Debug.LogWarning("Failed to spawn an enemy. Check if the enemyData assets are assigned and the factory is working correctly.");
+                    Debug.LogWarning("Failed to spawn enemy :(");
                 }
                 else
                 {
@@ -105,7 +107,11 @@ namespace EnemyScripts
         public void OnEnemyDestroyed()
         {
             _enemiesAliveCount--;
+
+            if (DifficultyManager.Instance != null)
+            {
+                DifficultyManager.Instance.EnemyKilled();
+            }
         }
-        
     }
 }

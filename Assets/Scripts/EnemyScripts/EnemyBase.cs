@@ -14,27 +14,34 @@ namespace EnemyScripts
         protected Transform playerTransform;
         protected EnemyData enemyData;
         protected float lastAttackTime;
+
+        private float _scaleDamage;
         
         public virtual void Initialize(Transform playerTransform, EnemyData enemyData)
         {
             this.playerTransform = playerTransform;
             this.enemyData = enemyData;
+            
+            var statMultiplier = 1.0f;
+            if (generalScripts.DifficultyManager.Instance != null)
+            {
+                statMultiplier = generalScripts.DifficultyManager.Instance.GetCurrentStatMultiplier();
+            }
+            
+            var scaledHealth = enemyData.maxHealth * statMultiplier;
+            _scaleDamage = enemyData.damage * statMultiplier;
+            
             if (health != null)
             {
-                health.SetMaxHealth(enemyData.maxHealth);
-                health.onDie.AddListener(Die);
                 health.onDie.RemoveAllListeners();
+                health.SetMaxHealth(scaledHealth);
+                health.onDie.AddListener(Die);
             }
             else
             {
                 Debug.LogError($"Health component is missing on {gameObject.name}. Cannot initialize health.");
             }
         }
-        
-        /*public void TakeDamage(float damage)
-        {
-            health.TakeDamage(damage);
-        }*/
         
         public void Die()
         {
@@ -93,7 +100,6 @@ namespace EnemyScripts
                     break;
                 }
             }
-            
             if (selectedDrop.itemToDropPrefab != null)
             {
                 Instantiate(selectedDrop.itemToDropPrefab, transform.position, Quaternion.identity);

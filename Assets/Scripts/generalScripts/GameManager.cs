@@ -81,7 +81,7 @@ namespace generalScripts
             _killCount += killCount;
             if (_gameUIManager != null)
             {
-                _gameUIManager.UpdateKillCount(_killCount/2);
+                _gameUIManager.UpdateKillCount(_killCount);
             }
         }
         public void UpdateHealth(float newHealth)
