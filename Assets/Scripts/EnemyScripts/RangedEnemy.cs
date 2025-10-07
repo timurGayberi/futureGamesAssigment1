@@ -15,8 +15,8 @@ namespace EnemyScripts
                 return;
             }
             
-            Vector3 directionToPlayer = playerTransform.position - transform.position;
-            float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg - 90f;
+            var directionToPlayer = playerTransform.position - transform.position;
+            var angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg - 90f;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
             
             var distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
@@ -27,12 +27,12 @@ namespace EnemyScripts
                 (
                     transform.position,
                     playerTransform.position,
-                    enemyData.moveSpeed * Time.deltaTime
+                    scaledMoveSpeed * Time.deltaTime
                 );
             }
             else
             {
-                if (Time.time >= lastAttackTime + enemyData.attackCooldown)
+                if (Time.time >= lastAttackTime + scaledAttackCooldown)
                 {
                     Shoot();
                     lastAttackTime = Time.time;
@@ -53,7 +53,7 @@ namespace EnemyScripts
 
             if (projectile != null)
             {
-                projectile.Initialize(enemyData.weaponData);
+                projectile.Initialize(enemyData.weaponData, scaleDamage );
             }
         }
     }

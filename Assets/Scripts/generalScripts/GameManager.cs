@@ -81,7 +81,7 @@ namespace generalScripts
             _killCount += killCount;
             if (_gameUIManager != null)
             {
-                _gameUIManager.UpdateKillCount(_killCount);
+                _gameUIManager.UpdateKillCount(_killCount/2);
             }
         }
         public void UpdateHealth(float newHealth)
@@ -114,6 +114,11 @@ namespace generalScripts
 
         public void RestartGame()
         {
+            if (difficultyManager != null)
+            {
+                difficultyManager.ResetDifficulty();
+            }
+            
             _gameTime = 0;
             _currentScore = 0;
             _killCount = 0;

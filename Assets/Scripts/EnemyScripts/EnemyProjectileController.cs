@@ -1,8 +1,6 @@
-using System;
 using UnityEngine;
 using scriptableObjects;
 using generalScripts;
-using MainCharacterScripts;
 
 namespace EnemyScripts
 {
@@ -10,7 +8,7 @@ namespace EnemyScripts
     {
         private WeaponData _data;
 
-        public void Initialize(WeaponData data)
+        public void Initialize(WeaponData data , float scaledDamage)
         {
             _data = data;
             
@@ -30,7 +28,6 @@ namespace EnemyScripts
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(_data.projectileDamage);
-                    //Debug.Log("Player shot!");
                 }
                 
                 Destroy(gameObject);

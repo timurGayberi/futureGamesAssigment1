@@ -17,7 +17,7 @@ MonoBehaviour:
   explosivePrefab: {fileID: 0}
   fireRate: 0.5
   projectileSpeed: 10
-  projectileGetDestroyTime: 0.75
+  projectileGetDestroyTime: 1
   projectileDamage: 5
   areaDamageRadius: 0
   isInfinite: 1

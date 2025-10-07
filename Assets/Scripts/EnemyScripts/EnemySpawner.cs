@@ -37,7 +37,11 @@ namespace EnemyScripts
             if (PlayerController.Instance != null)
             {
                 _playerTransform = PlayerController.Instance.transform;
-                StartCoroutine(SpawnEnemies());
+                if (_spawnCoroutine != null)
+                {
+                    StopCoroutine(_spawnCoroutine);
+                }
+                _spawnCoroutine = StartCoroutine(SpawnEnemies());
             }
         }
         public void Initialize(Transform player)
@@ -67,7 +71,7 @@ namespace EnemyScripts
                 var rateMultiplier = DifficultyManager.Instance.GetCurrentSpawnRateMultiplier();
                 var actualSpawnInterval = spawnInterval / rateMultiplier;
                 
-                yield return new WaitForSeconds(spawnInterval);
+                yield return new WaitForSeconds(actualSpawnInterval);
 
                 List<EnemyData> availableEnemies = DifficultyManager.Instance.GetAvailableEnemyTypes();
 
@@ -81,7 +85,7 @@ namespace EnemyScripts
                 EnemyData enemyData = availableEnemies[Random.Range(0, availableEnemies.Count)];
 
                 IEnemy newEnemy = null;
-                EnemyType type = enemyData.enemyType;
+                var type = enemyData.enemyType;
 
                 if (type == EnemyType.Melee)
                 {

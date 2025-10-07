@@ -15,7 +15,10 @@ namespace EnemyScripts
         protected EnemyData enemyData;
         protected float lastAttackTime;
 
-        private float _scaleDamage;
+        protected float scaleDamage,
+               scaledAttackCooldown,
+                    scaledMoveSpeed,
+                   scaledScoreValue;
         
         public virtual void Initialize(Transform playerTransform, EnemyData enemyData)
         {
@@ -29,7 +32,11 @@ namespace EnemyScripts
             }
             
             var scaledHealth = enemyData.maxHealth * statMultiplier;
-            _scaleDamage = enemyData.damage * statMultiplier;
+            
+            scaleDamage = enemyData.damage * statMultiplier;
+            scaledMoveSpeed = enemyData.moveSpeed * statMultiplier;
+            scaledAttackCooldown = enemyData.attackCooldown / statMultiplier;
+            scaledScoreValue = enemyData.scoreValue * statMultiplier;
             
             if (health != null)
             {
@@ -49,7 +56,7 @@ namespace EnemyScripts
             
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.AddScore((int)enemyData.scoreValue);
+                GameManager.Instance.AddScore((int)scaledScoreValue);
                 GameManager.Instance.OnEnemyDestroyed(1);
             }
             
@@ -80,15 +87,15 @@ namespace EnemyScripts
 
             if (validDrops.Count == 0) return;
             
-            int totalWeight = validDrops.Sum(config => config.dropWeight);
+            var totalWeight = validDrops.Sum(config => config.dropWeight);
             
             if (totalWeight <= 0) return;
             
-            int randomNumber = Random.Range(1, totalWeight + 1);
+            var randomNumber = Random.Range(1, totalWeight + 1);
             
-            DropConfiguration selectedDrop = new DropConfiguration(); 
+            var selectedDrop = new DropConfiguration(); 
             
-            int currentWeight = 0;
+            var currentWeight = 0;
             
             foreach (var config in validDrops)
             {
@@ -112,7 +119,7 @@ namespace EnemyScripts
             var playerHealth = other.GetComponent<Health>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(enemyData.damage);
+                playerHealth.TakeDamage(scaleDamage);
             }
         }
         private void OnTriggerEnter2D(Collider2D other)
@@ -127,7 +134,7 @@ namespace EnemyScripts
         {
             if (other.CompareTag("Player"))
             {
-                if (Time.time >= lastAttackTime + enemyData.attackCooldown)
+                if (Time.time >= lastAttackTime + scaledAttackCooldown)
                 {
                     DealDamageToPlayer(other);
                     lastAttackTime = Time.time;

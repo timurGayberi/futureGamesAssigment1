@@ -19,7 +19,7 @@ namespace EnemyScripts
             (
                 transform.position,
                 playerTransform.position,
-                enemyData.moveSpeed * Time.deltaTime
+                scaledMoveSpeed * Time.deltaTime
             );
         }
     }
