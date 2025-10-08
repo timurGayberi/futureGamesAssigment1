@@ -114,18 +114,20 @@ namespace generalScripts
 
         public void RestartGame()
         {
-            if (difficultyManager != null)
+            if (DifficultyManager.Instance != null)
             {
-                difficultyManager.ResetDifficulty();
+                DifficultyManager.Instance.ResetDifficulty(); 
             }
             
             _gameTime = 0;
             _currentScore = 0;
             _killCount = 0;
+            
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            
             CurrentGameState = GameState.Gameplay;
             _difficultyActivated = false;
-            Time.timeScale = 1f;
+            Time.timeScale = 1f; 
         }
         
         private void SetGameState(GameState newState)

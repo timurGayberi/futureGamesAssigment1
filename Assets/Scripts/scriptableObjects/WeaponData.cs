@@ -22,6 +22,5 @@ namespace scriptableObjects
                     isExplosive;
         public int maxAmmo;
         public  float reloadTime;
-        
     }
 }

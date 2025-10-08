@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEngine;
 using generalScripts;
 using scriptableObjects;
+using Random = UnityEngine.Random;
 
 namespace EnemyScripts
 {
@@ -26,15 +27,15 @@ namespace EnemyScripts
             this.enemyData = enemyData;
             
             var statMultiplier = 1.0f;
-            if (generalScripts.DifficultyManager.Instance != null)
+            if (DifficultyManager.Instance != null)
             {
-                statMultiplier = generalScripts.DifficultyManager.Instance.GetCurrentStatMultiplier();
+                statMultiplier = DifficultyManager.Instance.GetCurrentStatMultiplier();
             }
             
             var scaledHealth = enemyData.maxHealth * statMultiplier;
             
             scaleDamage = enemyData.damage * statMultiplier;
-            scaledMoveSpeed = enemyData.moveSpeed * statMultiplier;
+            scaledMoveSpeed = enemyData.damage * statMultiplier;
             scaledAttackCooldown = enemyData.attackCooldown / statMultiplier;
             scaledScoreValue = enemyData.scoreValue * statMultiplier;
             
@@ -44,12 +45,8 @@ namespace EnemyScripts
                 health.SetMaxHealth(scaledHealth);
                 health.onDie.AddListener(Die);
             }
-            else
-            {
-                Debug.LogError($"Health component is missing on {gameObject.name}. Cannot initialize health.");
-            }
         }
-        
+        protected virtual void Update(){}
         public void Die()
         {
             DropItem();
@@ -60,9 +57,9 @@ namespace EnemyScripts
                 GameManager.Instance.OnEnemyDestroyed(1);
             }
             
-            if (generalScripts.DifficultyManager.Instance != null)
+            if (DifficultyManager.Instance != null)
             {
-                generalScripts.DifficultyManager.Instance.EnemyKilled();
+                DifficultyManager.Instance.EnemyKilled();
             }
             
             Destroy(gameObject);
@@ -80,6 +77,8 @@ namespace EnemyScripts
             {
                 return;
             }
+            
+            var itemsDroppedCount = 0;
             
             var validDrops = enemyData.dropConfigurations
                 .Where(config => config.dropWeight > 0 && config.itemToDropPrefab != null)
@@ -113,7 +112,6 @@ namespace EnemyScripts
                 Debug.Log($"Enemy dropped single item: {selectedDrop.itemToDropPrefab.name} (Weight: {selectedDrop.dropWeight})");
             }
         }
-        protected virtual void Update(){}
         private void DealDamageToPlayer(Collider2D other)
         {
             var playerHealth = other.GetComponent<Health>();

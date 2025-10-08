@@ -34,7 +34,7 @@ namespace generalScripts
         public float spawnRateIncreasePerStage = 0.1f; 
         
         private int _killCount = 0;
-        private int _currentTierIndex = 0; 
+        private int _currentTierIndex = 0;
         
         private readonly List<EnemyData> _availableEnemyTypes = new List<EnemyData>();
         private readonly List<EnemyData> _initialEnemyTypes = new List<EnemyData>();
@@ -101,10 +101,6 @@ namespace generalScripts
                     
                 }
             }
-        }
-        public float GetScaledStartValue(float baseValue)
-        {
-            return baseValue * GetCurrentStatMultiplier();
         }
         public float GetCurrentStatMultiplier()
         {

@@ -30,6 +30,8 @@ namespace generalScripts
         private TextMeshProUGUI gameOverScoreText;
         
         [Header("HUD")]
+        
+        [Header("Top UI's")]
         [SerializeField]
         private TextMeshProUGUI healthText;
         [SerializeField]
@@ -39,11 +41,17 @@ namespace generalScripts
         [SerializeField] 
         private TextMeshProUGUI killCountText;
         [SerializeField]
+        
+        [Header("Bottom UI's")]
         private TextMeshProUGUI levelText;
         [SerializeField]
         private TextMeshProUGUI xpProgressText;
         [SerializeField]
-        private Slider slider;
+        private Slider xpSlider;
+        [SerializeField]
+        private TextMeshProUGUI missileCountText;
+        [SerializeField]
+        private Slider missileReloadSlider;
         
         private int _currentScore,
                     _killCount;
@@ -133,11 +141,11 @@ namespace generalScripts
                 levelText.text = $"Level:  {level}";
             }
 
-            if (slider != null)
+            if (xpSlider != null)
             {
-                slider.maxValue = requiredXp;
+                xpSlider.maxValue = requiredXp;
                 
-                slider.value = currentXp;
+                xpSlider.value = currentXp;
             }
 
             if (xpProgressText != null)
