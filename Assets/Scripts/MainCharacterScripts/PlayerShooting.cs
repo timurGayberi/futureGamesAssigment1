@@ -1,6 +1,7 @@
 using generalScripts;
 using UnityEngine;
 using scriptableObjects;
+using System; 
 
 namespace MainCharacterScripts
 {
@@ -14,16 +15,31 @@ namespace MainCharacterScripts
         [SerializeField]
         private WeaponData bulletData,
                            missileData;
+        
+        [Header("Missile Cooldown")]
+        public float missileCooldownRate = 0.5f; 
+        
+        [Header("Player Data")]
+        [SerializeField]
+        private PlayerStats playerStats;
+        
+        private float _lastBulletShotTime;
+        private float _lastMissileShotTime = -100f;
+        
+        public static Action<int, int> OnMissileAmmoUpdated; 
+        
+        public static Action<float> OnMissileCooldownStarted;
 
-        private float _lastBulletShotTime,
-                      _lastMissileShotTime,
-                      _reloadTimer;
-
-        private int _currentMissileAmmo;
-
-        private void Awake()
+        private void Start()
         {
-            _currentMissileAmmo = missileData.maxAmmo;
+            if (playerStats == null)
+            {
+                Debug.LogError("PlayerStats reference is missing on PlayerShooting. Disabling component.");
+                enabled = false;
+                return;
+            }
+            
+            OnMissileAmmoUpdated?.Invoke(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
         }
 
         private void Update()
@@ -37,16 +53,6 @@ namespace MainCharacterScripts
             {
                 FireWeapon(missileData);
             }
-
-            if (_reloadTimer > 0)
-            {
-                _reloadTimer -= Time.deltaTime;
-                if (_reloadTimer <= 0)
-                {
-                    _currentMissileAmmo = missileData.maxAmmo;
-                    Debug.Log("Missiles reloaded!");
-                }
-            }
         }
 
         private bool CanFire(WeaponData weaponData)
@@ -57,13 +63,18 @@ namespace MainCharacterScripts
             }
             else if (weaponData == missileData)
             {
-                return Time.time - _lastMissileShotTime >= weaponData.fireRate && _currentMissileAmmo > 0;
+                bool cooldownReady = Time.time - _lastMissileShotTime >= missileCooldownRate;
+                bool hasAmmo = playerStats.currentMissileAmount > 0;
+                
+                return cooldownReady && hasAmmo;
             }
             return false;
         }
 
         private void FireWeapon(WeaponData weaponData)
         {
+            Instantiate(weaponData.projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+
             if (weaponData == bulletData)
             {
                 _lastBulletShotTime = Time.time;
@@ -71,15 +82,33 @@ namespace MainCharacterScripts
             else if (weaponData == missileData)
             {
                 _lastMissileShotTime = Time.time;
-                _currentMissileAmmo--;
-                if (_currentMissileAmmo == 0)
+                playerStats.currentMissileAmount--;
+                OnMissileAmmoUpdated?.Invoke(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
+                OnMissileCooldownStarted?.Invoke(missileCooldownRate);
+                if (playerStats.currentMissileAmount == 0)
                 {
-                    _reloadTimer = missileData.reloadTime;
                     Debug.Log("Out of missiles");
                 }
             }
-
-            Instantiate(weaponData.projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+        }
+        
+        public void AddAmmo(int amount)
+        {
+            if (playerStats == null)
+            {
+                return;
+            }
+            
+            if (playerStats.currentMissileAmount >= playerStats.maxMissileAmount)
+            {
+                Debug.Log("Missile max capacity reached. Ammo not added.");
+                return;
+            }
+            playerStats.currentMissileAmount += amount;
+            playerStats.currentMissileAmount = Mathf.Min(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
+            OnMissileAmmoUpdated?.Invoke(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
+            
+            Debug.Log($"Missile ammo restored by {amount}. Current: {playerStats.currentMissileAmount}");
         }
     }
 }

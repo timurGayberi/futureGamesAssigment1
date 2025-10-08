@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace MainCharacterScripts
@@ -15,5 +16,19 @@ namespace MainCharacterScripts
         [Header("Combat Stats")]
         public float fireRate = 0.5f;
         public float projectileDamage = 10f;
+        
+        [Header("Missile Stats")]
+        public int currentMissileAmount;
+        public int maxMissileAmount;
+
+        private void OnEnable()
+        {
+            currentMissileAmount = maxMissileAmount;
+        }
+
+        public void RefillMissileAmmo(int amount)
+        {
+            currentMissileAmount = Mathf.Min(currentMissileAmount + amount, maxMissileAmount);
+        }
     }
 }

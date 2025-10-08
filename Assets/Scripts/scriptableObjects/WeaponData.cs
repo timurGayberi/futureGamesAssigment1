@@ -20,7 +20,5 @@ namespace scriptableObjects
         [Header("Ammo Properties")] 
         public bool isInfinite,
                     isExplosive;
-        public int maxAmmo;
-        public  float reloadTime;
     }
 }

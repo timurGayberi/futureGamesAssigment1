@@ -24,6 +24,10 @@ namespace generalScripts
         [Header("References")]
         [SerializeField] private DifficultyManager difficultyManager;
         
+        [Header("Game Data")]
+        [SerializeField]
+        private PlayerStats playerStats;
+        
         private float _gameTime,
                  _currentHealth;
         private int _currentScore,
@@ -124,6 +128,12 @@ namespace generalScripts
             _killCount = 0;
             
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            
+            if (playerStats != null)
+            {
+                Debug.Log("Resetting player stats before scene reload.");
+                playerStats.currentMissileAmount = playerStats.maxMissileAmount;
+            }
             
             CurrentGameState = GameState.Gameplay;
             _difficultyActivated = false;

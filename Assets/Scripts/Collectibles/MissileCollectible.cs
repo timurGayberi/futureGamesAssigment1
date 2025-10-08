@@ -12,9 +12,11 @@ namespace Collectibles
         
         public override void ApplyEffect(GameObject collector)
         {
+            var playerShooting = collector.GetComponent<PlayerShooting>();
+            
             if (PlayerLevelController.Instance != null)
             {
-                PlayerLevelController.Instance.AddExperience(ammoAmount);
+                playerShooting.AddAmmo(ammoAmount);
             }
         }
     }

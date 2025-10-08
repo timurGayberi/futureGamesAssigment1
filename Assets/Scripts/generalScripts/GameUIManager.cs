@@ -52,11 +52,26 @@ namespace generalScripts
         private TextMeshProUGUI missileCountText;
         [SerializeField]
         private Slider missileReloadSlider;
-        
+
         private int _currentScore,
                     _killCount;
                     
-        private float _currentHealth;            
+        private float _currentHealth;           
+        
+        private float _lastMissileFiredTime = -100f;
+        private float _missileCooldownDuration = 0.5f; 
+        
+        private void OnEnable()
+        {
+            PlayerShooting.OnMissileAmmoUpdated += UpdateMissileCountDisplay;
+            PlayerShooting.OnMissileCooldownStarted += StartMissileCooldownDisplay;
+        }
+        
+        private void OnDisable()
+        {
+            PlayerShooting.OnMissileAmmoUpdated -= UpdateMissileCountDisplay;
+            PlayerShooting.OnMissileCooldownStarted -= StartMissileCooldownDisplay;
+        }
         
         public void InitializeUI()
         {
@@ -72,6 +87,17 @@ namespace generalScripts
             {
                 SetPlayerName(JsonSaveManager.Instance.CurrentPlayerUsername);
             }
+            
+            if (playerData != null)
+            {
+                UpdateMissileCountDisplay(playerData.currentMissileAmount, playerData.maxMissileAmount);
+            }
+            
+            if (missileReloadSlider != null)
+            {
+                missileReloadSlider.maxValue = _missileCooldownDuration;
+                missileReloadSlider.value = _missileCooldownDuration;
+            }
         }
         private void Start()
         {
@@ -84,11 +110,11 @@ namespace generalScripts
             {
                 timerText.text = GameManager.Instance.GetFormatedTime();
             }
-            
             currentScoreText.text = "Current score: " + _currentScore;
             killCountText.text = "Kill count: " + _killCount;
             healthText.text = "Health: " + Mathf.Max(0, _currentHealth).ToString("F0");
-
+            
+            UpdateMissileSlider();
         }
 
         public void ShowGameplayUI()
@@ -151,6 +177,39 @@ namespace generalScripts
             if (xpProgressText != null)
             {
                 xpProgressText.text = $"{currentXp} / {requiredXp} XP";
+            }
+        }
+        
+        //Missile UI
+        
+        private void UpdateMissileSlider()
+        {
+            if (missileReloadSlider == null) return;
+            float timeElapsed = Time.time - _lastMissileFiredTime;
+            
+            float progress = Mathf.Min(timeElapsed, _missileCooldownDuration);
+            
+            missileReloadSlider.value = progress;
+        }
+        
+        public void UpdateMissileCountDisplay(int currentAmmo, int maxAmmo)
+        {
+            if (missileCountText != null)
+            {
+                missileCountText.text = $"Missiles: {currentAmmo} / {maxAmmo}";
+            }
+        }
+        
+        public void StartMissileCooldownDisplay(float cooldownDuration)
+        {
+            _missileCooldownDuration = cooldownDuration;
+            
+            _lastMissileFiredTime = Time.time;
+            
+            if (missileReloadSlider != null)
+            {
+                missileReloadSlider.maxValue = cooldownDuration;
+                missileReloadSlider.value = 0f;
             }
         }
         

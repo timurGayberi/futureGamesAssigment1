@@ -11,6 +11,5 @@ namespace scriptableObjects
             this.username = playerName;
             this.highScore = playerScore;
         }
-
     }
 }

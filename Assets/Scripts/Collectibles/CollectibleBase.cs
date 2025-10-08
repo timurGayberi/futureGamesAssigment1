@@ -59,7 +59,7 @@ namespace Collectibles
             }
             
             data.ApplyEffect(collector);
-            
+            StopAllCoroutines();
             Destroy(gameObject);
         }
     }

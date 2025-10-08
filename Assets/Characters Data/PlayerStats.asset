@@ -18,3 +18,5 @@ MonoBehaviour:
   currentLevel: 0
   fireRate: 10
   projectileDamage: 10
+  currentMissileAmount: 5
+  maxMissileAmount: 5
