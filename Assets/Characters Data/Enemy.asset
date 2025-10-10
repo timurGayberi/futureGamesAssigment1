@@ -16,7 +16,7 @@ MonoBehaviour:
   scoreValue: 1
   maxHealth: 10
   damage: 5
-  moveSpeed: 3
+  moveSpeed: 2
   attackCooldown: 0.5
   fireRange: 10
   weaponData: {fileID: 0}
