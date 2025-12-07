@@ -4,6 +4,7 @@ using scriptableObjects;
 using System.Collections;
 using System.Collections.Generic;
 using generalScripts;
+using generalScripts.Managers;
 
 namespace EnemyScripts
 {
@@ -66,6 +67,7 @@ namespace EnemyScripts
                 yield break;
             }
             
+            /*
             while (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Gameplay)
             {
                 var rateMultiplier = DifficultyManager.Instance.GetCurrentSpawnRateMultiplier();
@@ -105,9 +107,10 @@ namespace EnemyScripts
                 {
                     _enemiesAliveCount++;
                 }
+                */
 
             }
-        }
+    
         public void OnEnemyDestroyed()
         {
             _enemiesAliveCount--;

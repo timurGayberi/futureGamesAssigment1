@@ -1,7 +1,8 @@
 using generalScripts;
+using generalScripts.Interfaces;
 using UnityEngine;
 using scriptableObjects;
-using System; 
+using System;
 
 namespace MainCharacterScripts
 {
@@ -15,19 +16,20 @@ namespace MainCharacterScripts
         [SerializeField]
         private WeaponData bulletData,
                            missileData;
-        
+
         [Header("Missile Cooldown")]
-        public float missileCooldownRate = 0.5f; 
-        
+        public float missileCooldownRate = 0.5f;
+
         [Header("Player Data")]
         [SerializeField]
         private PlayerStats playerStats;
-        
+
         private float _lastBulletShotTime;
         private float _lastMissileShotTime = -100f;
-        
-        public static Action<int, int> OnMissileAmmoUpdated; 
-        
+
+        private IInputManager inputManager;
+
+        public static Action<int, int> OnMissileAmmoUpdated;
         public static Action<float> OnMissileCooldownStarted;
 
         private void Start()
@@ -38,18 +40,29 @@ namespace MainCharacterScripts
                 enabled = false;
                 return;
             }
-            
+
+            // Get InputManager from ServiceLocator
+            inputManager = ServiceLocator.GetService<IInputManager>();
+            if (inputManager == null)
+            {
+                Debug.LogError("[PlayerShooting] InputManager not found!");
+            }
+
             OnMissileAmmoUpdated?.Invoke(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
         }
 
         private void Update()
         {
-            if (KeyboardInputListener.Instance.MouseLeftClick && CanFire(bulletData))
+            if (inputManager == null) return;
+
+            // LMB - Normal attack (bullets)
+            if (inputManager.IsAttacking && CanFire(bulletData))
             {
                 FireWeapon(bulletData);
             }
-            
-            if (KeyboardInputListener.Instance.MouseRightClick && CanFire(missileData))
+
+            // RMB - Special attack (missiles)
+            if (inputManager.IsSpecialAttacking && CanFire(missileData))
             {
                 FireWeapon(missileData);
             }
@@ -65,7 +78,7 @@ namespace MainCharacterScripts
             {
                 bool cooldownReady = Time.time - _lastMissileShotTime >= missileCooldownRate;
                 bool hasAmmo = playerStats.currentMissileAmount > 0;
-                
+
                 return cooldownReady && hasAmmo;
             }
             return false;
@@ -91,14 +104,14 @@ namespace MainCharacterScripts
                 }
             }
         }
-        
+
         public void AddAmmo(int amount)
         {
             if (playerStats == null)
             {
                 return;
             }
-            
+
             if (playerStats.currentMissileAmount >= playerStats.maxMissileAmount)
             {
                 Debug.Log("Missile max capacity reached. Ammo not added.");
@@ -107,7 +120,7 @@ namespace MainCharacterScripts
             playerStats.currentMissileAmount += amount;
             playerStats.currentMissileAmount = Mathf.Min(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
             OnMissileAmmoUpdated?.Invoke(playerStats.currentMissileAmount, playerStats.maxMissileAmount);
-            
+
             Debug.Log($"Missile ammo restored by {amount}. Current: {playerStats.currentMissileAmount}");
         }
     }

@@ -57,10 +57,12 @@ namespace generalScripts
         }
         private void UpdateHealthUI()
         {
+            /*
             if (gameObject.CompareTag("Player") && GameManager.Instance != null)
             {
                 GameManager.Instance.UpdateHealth(currentHealth);
             }
+            */
         }
     }
 }

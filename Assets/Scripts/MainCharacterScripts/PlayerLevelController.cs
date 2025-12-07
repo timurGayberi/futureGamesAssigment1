@@ -1,6 +1,7 @@
 using generalScripts;
 using UnityEngine;
 using System;
+using generalScripts.Managers;
 
 namespace MainCharacterScripts
 {

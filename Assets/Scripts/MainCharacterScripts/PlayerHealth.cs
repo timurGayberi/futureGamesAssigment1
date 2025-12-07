@@ -26,7 +26,7 @@ namespace MainCharacterScripts
 
         public void Die()
         {
-            GameManager.Instance.OnPlayerDied();
+            //GameManager.Instance.OnPlayerDied();
             Destroy(gameObject);
         }
     }

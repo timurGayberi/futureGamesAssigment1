@@ -1,6 +1,7 @@
 using System.Linq;
 using UnityEngine;
 using generalScripts;
+using generalScripts.Managers;
 using scriptableObjects;
 using Random = UnityEngine.Random;
 
@@ -51,11 +52,13 @@ namespace EnemyScripts
         {
             DropItem();
             
+            /*
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.AddScore((int)scaledScoreValue);
                 GameManager.Instance.OnEnemyDestroyed(1);
             }
+            */
             
             if (DifficultyManager.Instance != null)
             {
