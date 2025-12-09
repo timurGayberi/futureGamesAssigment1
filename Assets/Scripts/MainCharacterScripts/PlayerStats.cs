@@ -10,6 +10,7 @@ namespace MainCharacterScripts
         [Header("Core Stats")]
         public float maxHealth = 100f;
         public float moveSpeed = 5f;
+        public float boostSpeed = 10f;
         public float rotationSpeed = 100f;
         public int currentLevel ;
 

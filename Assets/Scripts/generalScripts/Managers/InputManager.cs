@@ -18,6 +18,7 @@ namespace generalScripts.Managers
         // Button States
         public bool IsAttacking { get; private set; }
         public bool IsSpecialAttacking { get; private set; }
+        public bool IsBoosting { get; private set; }
 
         // Events
         public event Action OnAttackPressed;
@@ -25,6 +26,8 @@ namespace generalScripts.Managers
         public event Action OnSpecialAttackPressed;
         public event Action OnSpecialAttackReleased;
         public event Action OnPausePressed;
+        public event Action OnBoostPressed;
+        public event Action OnBoostReleased;
 
         // Platform Detection
         public bool IsMobile
@@ -47,11 +50,11 @@ namespace generalScripts.Managers
         private void Awake()
         {
             playerInputs = new PlayerInputs();
-            
+
             SubscribeToInputEvents();
-            
+
             EnableGameplayControls();
-            
+
             ServiceLocator.RegisterService<IInputManager>(this);
             Debug.Log("[InputManager] Registered with ServiceLocator");
         }
@@ -76,6 +79,7 @@ namespace generalScripts.Managers
 
                 IsAttacking = playerInputs.Gameplay.Attack.IsPressed();
                 IsSpecialAttacking = playerInputs.Gameplay.SpecialAttack.IsPressed();
+                IsBoosting = playerInputs.Gameplay.Boost.IsPressed();
             }
         }
 
@@ -84,6 +88,10 @@ namespace generalScripts.Managers
             // Attack
             playerInputs.Gameplay.Attack.started += ctx => OnAttackPressed?.Invoke();
             playerInputs.Gameplay.Attack.canceled += ctx => OnAttackReleased?.Invoke();
+
+            // Boost
+            playerInputs.Gameplay.Boost.started += ctx => OnBoostPressed?.Invoke();
+            playerInputs.Gameplay.Boost.canceled += ctx => OnBoostReleased?.Invoke();
 
             // Special Attack
             playerInputs.Gameplay.SpecialAttack.started += ctx => OnSpecialAttackPressed?.Invoke();
@@ -99,29 +107,34 @@ namespace generalScripts.Managers
 
             playerInputs.Gameplay.Attack.started -= ctx => OnAttackPressed?.Invoke();
             playerInputs.Gameplay.Attack.canceled -= ctx => OnAttackReleased?.Invoke();
+
             playerInputs.Gameplay.SpecialAttack.started -= ctx => OnSpecialAttackPressed?.Invoke();
             playerInputs.Gameplay.SpecialAttack.canceled -= ctx => OnSpecialAttackReleased?.Invoke();
+
             playerInputs.Gameplay.Pause.performed -= ctx => OnPausePressed?.Invoke();
+
+            playerInputs.Gameplay.Boost.started -= ctx => OnBoostPressed?.Invoke();
+            playerInputs.Gameplay.Boost.canceled -= ctx => OnBoostReleased?.Invoke();
         }
 
         public void EnableGameplayControls()
         {
             playerInputs.Gameplay.Enable();
             playerInputs.UI.Disable();
-            Debug.Log("[InputManager] Gameplay controls enabled");
+            //Debug.Log("[InputManager] Gameplay controls enabled");
         }
 
         public void DisableGameplayControls()
         {
             playerInputs.Gameplay.Disable();
-            Debug.Log("[InputManager] Gameplay controls disabled");
+            //Debug.Log("[InputManager] Gameplay controls disabled");
         }
 
         public void EnableUIControls()
         {
             playerInputs.UI.Enable();
             playerInputs.Gameplay.Disable();
-            Debug.Log("[InputManager] UI controls enabled");
+            //Debug.Log("[InputManager] UI controls enabled");
         }
 
         public void DisableUIControls()
@@ -165,7 +178,7 @@ namespace generalScripts.Managers
         {
             playerInputs.asset.RemoveAllBindingOverrides();
             PlayerPrefs.DeleteKey("InputBindings");
-            Debug.Log("[InputManager] Reset all bindings to default");
+            //Debug.Log("[InputManager] Reset all bindings to default");
         }
 
         public void SaveBindings()
@@ -173,7 +186,7 @@ namespace generalScripts.Managers
             var rebinds = playerInputs.asset.SaveBindingOverridesAsJson();
             PlayerPrefs.SetString("InputBindings", rebinds);
             PlayerPrefs.Save();
-            Debug.Log("[InputManager] Bindings saved");
+            //Debug.Log("[InputManager] Bindings saved");
         }
 
         public void LoadBindings()

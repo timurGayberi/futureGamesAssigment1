@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using generalScripts;
 using generalScripts.Managers;
+using generalScripts.Interfaces;
 
 namespace EnemyScripts
 {
@@ -12,15 +13,15 @@ namespace EnemyScripts
     {
         [Header("Factory Reference")]
         [SerializeField] private EnemyFactory enemyFactory;
-        
+
         [Header("Spawn Settings")]
         [SerializeField]
         public float spawnInterval;
         [SerializeField]
-        private float spawnRadius; 
-        
+        private float spawnRadius;
+
         private Transform _playerTransform;
-        private int _enemiesAliveCount = 0; 
+        private int _enemiesAliveCount = 0;
         private Coroutine _spawnCoroutine;
 
         private void Start()
@@ -35,9 +36,9 @@ namespace EnemyScripts
                 return;
             }
 
-            if (PlayerController.Instance != null)
+            if (ServiceLocator.TryGetService<IPlayerController>(out var playerController))
             {
-                _playerTransform = PlayerController.Instance.transform;
+                _playerTransform = playerController.transform;
                 if (_spawnCoroutine != null)
                 {
                     StopCoroutine(_spawnCoroutine);
@@ -50,7 +51,7 @@ namespace EnemyScripts
             if (_playerTransform == null)
             {
                 _playerTransform = player;
-                
+
                 if (_spawnCoroutine != null)
                 {
                     StopCoroutine(_spawnCoroutine);
@@ -58,7 +59,7 @@ namespace EnemyScripts
                 _spawnCoroutine = StartCoroutine(SpawnEnemies());
             }
         }
-        
+
         private IEnumerator SpawnEnemies()
         {
             if (_playerTransform == null)
@@ -66,7 +67,7 @@ namespace EnemyScripts
                 Debug.LogError("Player transform not set. Spawner cannot run.");
                 yield break;
             }
-            
+
             /*
             while (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Gameplay)
             {
@@ -109,8 +110,8 @@ namespace EnemyScripts
                 }
                 */
 
-            }
-    
+        }
+
         public void OnEnemyDestroyed()
         {
             _enemiesAliveCount--;

@@ -5,14 +5,8 @@ using UnityEngine;
 
 namespace MainCharacterScripts
 {
-    /// <summary>
-    /// Controls player helicopter movement and rotation based on processed inputs
-    /// All parameters are adjustable in Unity Editor
-    /// </summary>
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IPlayerController
     {
-        public static PlayerController Instance;
-
         [Header("Component References")]
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerShooting playerShooting;
@@ -22,37 +16,52 @@ namespace MainCharacterScripts
         [SerializeField] private PlayerStats playerStats;
 
         [Header("Rotation Settings")]
-        [Tooltip("Rotation speed multiplier")]
-        [SerializeField] private float rotationSpeed = 5f;
+        [Tooltip("Controls how fast the aim sprite rotates towards the mouse (Sensitivity)")]
+        [SerializeField] private float aimRotationSpeed = 8f;
+
+        [Tooltip("Rotation speed multiplier for the body (delayed follow)")]
+        [SerializeField] private float bodyRotationSpeed = 3f;
 
         [Tooltip("Additional rotation from A/D steering")]
         [SerializeField] private float steeringRotationSpeed = 100f;
 
+        [Header("Visuals")]
+        [SerializeField] private Transform lookDirectionSprite;
+        [SerializeField] private generalScripts.Visuals.SpriteParallaxSystem parallaxSystem;
+
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            ServiceLocator.RegisterService<IPlayerController>(this);
+            DontDestroyOnLoad(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            ServiceLocator.UnregisterService<IPlayerController>(this);
         }
 
         public void Start()
         {
+            // ~~~ Need to be moved to gameplay ! ~~~ //
+
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Confined;
+
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
+
             playerMovement.Initialize(playerStats);
 
-            // Validate input processor
+            if (inputProcessor != null) return;
+            inputProcessor = GetComponent<PlayerInputProcessor>();
             if (inputProcessor == null)
             {
-                inputProcessor = GetComponent<PlayerInputProcessor>();
-                if (inputProcessor == null)
-                {
-                    Debug.LogError("[PlayerController] PlayerInputProcessor component not found!");
-                }
+                //Debug.LogError("[PlayerController] PlayerInputProcessor component not found!");
+            }
+
+            if (parallaxSystem == null)
+            {
+                parallaxSystem = GetComponentInChildren<generalScripts.Visuals.SpriteParallaxSystem>();
             }
         }
 
@@ -60,6 +69,7 @@ namespace MainCharacterScripts
         {
             if (inputProcessor == null) return;
 
+            HandleBoost();
             HandleMovement();
             HandleRotation();
             HandleSteering();
@@ -67,9 +77,8 @@ namespace MainCharacterScripts
 
         private void HandleMovement()
         {
-            Vector2 movementDirection = Vector2.zero;
+            var movementDirection = Vector2.zero;
 
-            // Only apply movement if allowed by dead zone
             if (inputProcessor.CanMove && inputProcessor.ThrottleInput != 0)
             {
                 movementDirection = (Vector2)transform.up * inputProcessor.ThrottleInput;
@@ -82,30 +91,48 @@ namespace MainCharacterScripts
 
             playerMovement.SetInput(movementDirection);
             playerMovement.Tick();
+
+            if (parallaxSystem != null)
+            {
+                parallaxSystem.UpdateParallax(movementDirection);
+            }
+        }
+
+        private void HandleBoost()
+        {
+            if (inputProcessor != null && playerMovement != null)
+            {
+                playerMovement.SetBoosting(inputProcessor.IsBoosting);
+            }
         }
 
         private void HandleRotation()
         {
-            // Only rotate if conditions are met
-            if (inputProcessor.ShouldRotate)
-            {
-                float currentAngle = transform.eulerAngles.z;
-                float targetAngle = inputProcessor.TargetRotationAngle;
-                float smoothFactor = inputProcessor.GetRotationSmoothFactor();
+            if (!inputProcessor.ShouldRotate) return;
+            var targetAngle = inputProcessor.TargetRotationAngle;
+            var smoothFactor = inputProcessor.GetRotationSmoothFactor();
+            var currentBodyAngle = transform.eulerAngles.z;
+            var targetBodyAngle = (lookDirectionSprite != null) ? lookDirectionSprite.eulerAngles.z : targetAngle;
+            var newBodyAngle = Mathf.LerpAngle(
+                currentBodyAngle,
+                targetBodyAngle,
+                bodyRotationSpeed * Time.deltaTime
+            );
 
-                float newAngle = Mathf.LerpAngle(
-                    currentAngle,
-                    targetAngle,
-                    rotationSpeed * smoothFactor * Time.deltaTime
-                );
-
-                transform.rotation = Quaternion.Euler(0, 0, newAngle);
-            }
+            transform.rotation = Quaternion.Euler(0, 0, newBodyAngle);
+            if (lookDirectionSprite == null) return;
+            var currentSpriteAngle = lookDirectionSprite.eulerAngles.z;
+            var newSpriteAngle = Mathf.LerpAngle(
+                currentSpriteAngle,
+                targetAngle,
+                aimRotationSpeed * smoothFactor * Time.deltaTime
+            );
+            lookDirectionSprite.rotation = Quaternion.Euler(0, 0, newSpriteAngle);
         }
 
         private void HandleSteering()
         {
-            // A/D keys for additional steering
+            /*
             if (inputProcessor.SteerInput != 0)
             {
                 transform.Rotate(
@@ -113,6 +140,7 @@ namespace MainCharacterScripts
                     inputProcessor.SteerInput * steeringRotationSpeed * Time.deltaTime
                 );
             }
+            */
         }
     }
 }
