@@ -81,7 +81,7 @@ namespace generalScripts.Visuals
 
             if (useMovement && _rb != null)
             {
-                finalWorldParallax += -_rb.linearVelocity * movementIntensity;
+                finalWorldParallax += _rb.linearVelocity * movementIntensity;
             }
 
             Vector2 finalLocalParallax = transform.InverseTransformVector(finalWorldParallax);
